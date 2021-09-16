@@ -1,0 +1,62 @@
+Este práctico debe servir como demo para experimentar con el modelo de phong
+para entenderlo. Al final del práctico deben ser capaces de identificar el 
+efecto/aporte de cada componente de la luz y del material, de predecir cómo se
+vería el objeto para una configuración dada, y de inferir qué configuración
+habría que cargar para lograr que se vea de cierta forma.
+
+  
+Analicen primero el código de cal_settings (.h y .cpp) para entender cómo se 
+implementa en OpenGL.
+	
+
+Sugerencias de cosas a probar/pensar:
+
+ - Poner todas las componentes luces en 0,0,0,1 y luego ir restableciendo sus
+   valores de a uno para ver cómo impacta cada componente.
+   
+ - Probar con distintos exponentes de brillo (1 a 127)
+ 
+ - Activar/Desactivar colormaterial, y modificar material y color
+ 
+ - Lograr un mismo resultado primero con luces blancas y colores en el materia,
+   y luego con un material blanco y cambiando los colores de la luz
+   
+ - Poner luces blancas, y el material rojo en la comp. ambiente, verde en la 
+   difusa, y azul en la especular. Intentar predecir cómo se debería ver, y 
+   luego verificarlo.
+ 
+ - ¿Cómo puedo ver un efecto equivalente al "sombreado" de Phong? ¿En qué casos
+   se nota la diferencia?
+  
+ - Alternar entre luz local y luz en el infinito, observador local y observador
+   en el infinito. ¿En qué caso se nota "más" la diferencia?
+   
+ - Mover la primer luz, activar la segundo luz y probar combinaciones.
+ 
+ - Apagar todas las luces ¿veo algo? ¿por qué?
+  
+  
+
+Durante la ejecución, se puede:
+	- cambiar el objeto cental con C y Shift+C.
+	- detener/reiniciar la rotación con R
+	- aumentar o disminuir el nivel de detalle con + y -
+	- ver/ocultar la malla de alambres con L
+	- cambiar el método de sombreado entre flat y gourad con S
+  - arrastrar con el botón derecho mueve la posición de la luz 0 en x,y
+  - arrastrar con el botón derecho y control apretado, mueve el z de la luz 0
+  - arrastrar con el botón derecho y shift apretado, cambian el zoom
+  
+
+Si usan ZinjaI, pueden modificar luces y materiales mientras se ejecuta:
+ 1. Ejecuten el programa para depuración (F5, o menú Depuracion->Iniciar/Cont.).
+ 2. El programa va a detenerse en el main (deberia haber un pto de interrupcion 
+    en la llamada a glutMainLoop, si no colocarlo)
+ 3. En la tabla de inspecciones tienen la expresion "settings" (si no, agregarla)
+ 4. Click derecho en la expresión, y el menú contextual que aparece elegir
+    "Otras visualizaciones"->"Editar durante la ejecución"
+ 5. Continuar la ejecución (F5, o menú Depuración->Iniciar/Continuar)
+ 6. Modificar cualquier valor en la ventana de la inspección y presionar
+    Enter para aplicar el cambio.
+
+

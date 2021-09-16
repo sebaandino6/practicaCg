@@ -1,0 +1,20 @@
+Este es un practico de ejemplo, para analizar la diferencia entre la luz
+direccional y posicional, y visualizar el Diagrama de Voronoi.
+
+No hay que modificar el código, solo ejecutarlo y entender el funcionamiento.
+
+Picando se forman conos vistos desde arriba que se pueden mover.
+
+Los conos vistos desde arriba reproducen algo llamado diagrama de Voronoi,
+que estudiaremos mas adelante.
+
+Con el botón derecho del ratón se accede a un menú.
+Con <Shift> y arrastrar con el ratón se cambia el diametro de los conos.
+Con <Ctrl> y arrastrar con el ratón, el cursor "define" la ubicación de la luz 
+  (ver dónde está realmente ubicada)
+
+Vean el efecto de iluminación vs. color.
+
+Vean el efecto del cambio de luz posicional a direccional (se alterna con la 
+tecla P), y la interpretación de la "dirección" en el 2do caso.
+

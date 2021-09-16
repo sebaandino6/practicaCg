@@ -1,0 +1,39 @@
+En este práctico podran experimentar con el efecto de fog, el decaimiento con
+la distancia y las luces spot. El objetivo es que prueben distintas configuraciones
+de parámetros e intenten interpretar lo que ven. Al final del práctico deben ser
+capaces de identificar el efecto de los parámetros, de predecir cómo se
+vería el objeto para una configuración dada, y de inferir qué configuración
+habría que cargar para lograr que se vea de cierta forma.
+
+- Se puede disminuir y aumentar el exponente de la luz spot presionando 'e' y 'E'
+respectivamente. Si utilizamos un exponente demasiado bajo, se ve una especie de
+pixelado en las teteras ¿Por qué sucede esto?
+ 
+- Presionando 'c', 'l' y 'q' se pueden modificar los valores de los términos
+constante, linear y cuadrático del decaimiento por la distancia, tanto en mayusculas
+ (para disminuir) o en minúsculas (para aumentar). Encontrar una conjunto de parámetros
+ que genere este efecto y mantenga el nivel de iluminación de la escena.
+ 
+- Con 'm' podemos cambiar la función de fog y con 'd' y 'd' reducir o aumentar
+la "cantidad" de este efecto, respectivamente. Con neblina, se puede ver las siluetas
+de las teteras que no reciben luz. Sin esta, todas las teteras no iluminadas tienen
+un color constante. ¿Por que?
+
+- Con 'f' y 's' se pueden desactivar niebla y spot respectivamente para observar
+los efectos individuales.
+
+
+
+Si usan ZinjaI, pueden modificar las propiedades de la luz y la niebla mientras 
+se ejecuta:
+ 1. Ejecuten el programa para depuración (F5, o menú Depuracion->Iniciar/Cont.).
+ 2. El programa va a detenerse en el main (deberia haber un pto de interrupcion 
+    en la llamada a glutMainLoop, si no colocarlo)
+ 3. En la tabla de inspecciones tienen la expresion "settings" (si no, agregarla)
+ 4. Click derecho en la expresión, y el menú contextual que aparece elegir
+    "Otras visualizaciones"->"Editar durante la ejecución"
+ 5. Continuar la ejecución (F5, o menú Depuración->Iniciar/Continuar)
+ 6. Modificar cualquier valor en la ventana de la inspección y presionar
+    Enter para aplicar el cambio.
+
+
