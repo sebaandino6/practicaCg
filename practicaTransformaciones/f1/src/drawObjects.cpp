@@ -124,18 +124,22 @@ void drawAuto(int lod) {
       0.2 , 0   , 0   , 0.00,  
       0   , 0.4 , 0   , 0.00,  
       0   , 0   , 0.05, 0.00,  
-     -0.75, 0   , 0.03, 1.00 
+     -0.75, 0   , 0.3 , 1.00 
   };
   glMultMatrixf(mtAleronTrasero);
   drawAleron();
   glPopMatrix();
   
- 
-
-  //drawAleron(); // trasero
-  
-  //SdrawCasco(lod);
-  
+  glPushMatrix();
+    float mtCasco[] = { 
+        0.1 , 0   , 0   , 0.00,  
+        0   , 0.1 , 0   , 0.00,  
+        0   , 0   , 0.1 , 0.00,  
+        0   , 0   , 0.2 , 1.00 
+    };
+    glMultMatrixf(mtCasco);
+    drawCasco(lod);
+  glPopMatrix();
 }
 
 void drawObjects(bool animado, int lod) {
