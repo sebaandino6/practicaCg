@@ -20,10 +20,7 @@
 void drawAuto(int lod) {
   
   /// @TODO: aplicar las transformaciones necesarias para ubicar las partes del auto como van
-  
-  
-
-  glPushMatrix();
+   glPushMatrix();
     float mt[] = { 
       0.95, 0   , 0   , 0.00,  
       0   , 0.25, 0   , 0.00,  
@@ -111,8 +108,29 @@ void drawAuto(int lod) {
     drawChasis();
   glPopMatrix();
   
+  glPushMatrix();
+  float mtAleronDelantero[] = { 
+    0.1, 0   , 0   , 0.00,  
+    0  , 0.3 , 0   , 0.00,  
+    0  , 0   , 0.03, 0.00,  
+    0.8 , 0   , 0   , 1.00 
+  };
+  glMultMatrixf(mtAleronDelantero);
+  drawAleron();
+  glPopMatrix();
   
-  //drawAleron(); // delantero
+  glPushMatrix();
+  float mtAleronTrasero[] = { 
+      0.2 , 0   , 0   , 0.00,  
+      0   , 0.4 , 0   , 0.00,  
+      0   , 0   , 0.05, 0.00,  
+     -0.75, 0   , 0.03, 1.00 
+  };
+  glMultMatrixf(mtAleronTrasero);
+  drawAleron();
+  glPopMatrix();
+  
+ 
 
   //drawAleron(); // trasero
   
