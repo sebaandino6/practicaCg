@@ -147,9 +147,32 @@ void drawObjects(bool animado, int lod) {
   if (animado) {
     drawPista(la_pista.ancho,la_pista.alto);
     /// @TODO: ubicar el auto en la pista
+    glPushMatrix();
+    float mtAuto[] = { 
+      0   , 0   , 0   , 0.00,  
+      0   , 0   , 0   , 0.00,  
+      0   , 0   , 0.2 , 0.00,  
+      0   , 0   , 0   , 1.00 
+    };
+    glMultMatrixf(mtAuto);
+    drawAuto(lod);
+    glPopMatrix();
+    
   }
+
+  glPushMatrix();
+    float mtAuto[] = { 
+      0   , 0   , 0   , 0.00,  
+      0   , 0   , 0   , 0.00,  
+      0   , 0   , 0.2 , 0.00,  
+      0   , 0   , 0   , 1.00 
+    };
+    glMultMatrixf(mtAuto);
+    drawAuto(lod);
+  glPopMatrix();
   
-  drawAuto(lod);
+  
+  //drawAuto(lod);
   
   if (!animado) {
     drawCube();
