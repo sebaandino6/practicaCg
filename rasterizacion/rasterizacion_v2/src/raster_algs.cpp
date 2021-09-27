@@ -11,19 +11,39 @@
 #include "raster_algs.hpp"
 
 void draw_line(Point p0, Point p1) {
-    glBegin(GL_POINTS);
-    glColor4f(0,0,0,.5);
-    int n = p1.x - p0.x;
-    float dy = (1.0/n)*(p1-p0).y;
-    
-    for( Point p = p0; p.x <= p1.x; ++p.x) {
-        glVertex2f(p.x,p.y);
-        p.y+= dy;
-    }
-    
-    
     /// @TODO: implementar algun algoritmo de rasterizacion de segmentos
+    glBegin(GL_POINTS);
+       
+    glColor4f(0,0,0,.5);
+    float dy = (p1.y-p0.y);
+    float dx = (p1.x-p0.x);
+       
+    if(abs(dx) < abs(dy)) {
+        if(dy < 0){
+            Point aux = p0;
+            p0 = p1;
+            p1 = aux;
+        }
+        float m = dx/dy;
+        for( Point p = p0; p.y <= p1.y; ++p.y) {
+            glVertex2f(p.x,redon(p.y));
+            p.x+= m;
+        }
+    }else{
+        if(dx < 0){
+            Point aux = p0;
+            p0 = p1;
+            p1 = aux;
+        }
+        
+        float m = dy/dx;
     
+        for( Point p = p0; p.x <= p1.x; ++p.x) {
+            glVertex2f(redon(p.x),p.y);
+            p.y+= m;
+        }
+    }
+        
     glEnd();
 }
 
