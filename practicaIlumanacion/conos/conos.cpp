@@ -28,7 +28,7 @@ float color_cono[max_cantidad][3];
 int cono_editado=-1; // si -1 => no se esta desplazando ningun cono
 float radio=1000, radio0=1000; // radio de los conos
 int xclick,yclick; // x e y cuando clickeo un boton
-float lpos[]={100,100,100,1}; // posicion luz, l[4]: 0 => direccional -- 1 => posicional
+float lpos[]={100,0,0,0}; // posicion luz, l[4]: 0 => direccional -- 1 => posicional
 
 bool zbuffer=true; // habilita el z-buffer
 bool luz=true;     // habilita la iluminacion

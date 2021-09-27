@@ -18,9 +18,8 @@
 
 
 void drawAuto(int lod) {
-  
   /// @TODO: aplicar las transformaciones necesarias para ubicar las partes del auto como van
-   glPushMatrix();
+  glPushMatrix();
     float mt[] = { 
       0.95, 0   , 0   , 0.00,  
       0   , 0.25, 0   , 0.00,  
@@ -147,6 +146,16 @@ void drawObjects(bool animado, int lod) {
   if (animado) {
     drawPista(la_pista.ancho,la_pista.alto);
     /// @TODO: ubicar el auto en la pista
+    glPushMatrix();
+    float mtLocate[] = { 
+      1, 0, 0  , 0.00,  
+        0, 1, 0  , 0.00,  
+        0, 0, 1  , 0.00,  
+        0, 0, 0.2, 1.00
+    };
+    glMultMatrixf(mtLocate);
+    drawAuto(lod);
+    glPopMatrix();
   }
   
   if (!animado) {
@@ -162,6 +171,20 @@ void drawObjects(bool animado, int lod) {
     glMultMatrixf(mtLocate);
     drawAuto(lod);
     glPopMatrix();
+    
+  
+    glPushMatrix();
+    float mtWheelDirection[] = { 
+      cos(180/(M_PI*el_auto.rang1)), 0, 0  , 0.00,  
+      0, 1, 0  , 0.00,  
+      0, 0, 1  , 0.00,  
+      0, 0, 0.2, 1.00
+    };
+    glMultMatrixf(mtWheelDirection);
+    drawAuto(lod);
+    glPopMatrix();
+    
+    
   }
   
 }
