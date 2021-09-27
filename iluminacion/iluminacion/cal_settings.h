@@ -1,7 +1,7 @@
 #ifndef CAL_SETTINGS_H
 #define CAL_SETTINGS_H
 
-// configuraciones generales del modelo de color e iluminación
+// configuraciones generales del modelo de color e iluminaciÃ³n
 struct general_settings_t {
   bool enable_lighting = false;
   bool local_viewer = true;
@@ -21,7 +21,7 @@ struct light_settings_t {
   void Apply(GLenum light_num) const;
 };
 
-// configuración de un material
+// configuraciÃ³n de un material
 struct material_settings_t {
 	float emission[4] = {0.f ,0.0f , 0.f,1.f};
 	float ambient[4]  = {1.0f,0.0f,0.0f,1.f};
