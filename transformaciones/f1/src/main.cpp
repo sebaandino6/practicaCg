@@ -89,21 +89,33 @@ void Display_cb() { // Este tiene que estar
 
   glPushMatrix();
   
-  /// @TODO: Esta luz se mueve con la camara... no debería
+  /// @TODO: Esta luz se mueve con la camara... no debería  
   glLightfv(GL_LIGHT0,GL_POSITION,lpos);  // ubica la luz
   
   if (animado) {
-    
     if (top_view) {
-      
       /// @TODO: Hacer que la camara gire para que el auto siempre apunte hacia arriba
-      gluLookAt(el_auto.x,el_auto.y,15,el_auto.x,el_auto.y,0,1,0,0);
+//      float mt[] = { 
+//        sin(135-el_auto.ang), -cos(135-el_auto.ang), 0, 0.00,  
+//        cos(135-el_auto.ang), sin(135-el_auto.ang), 0, 0.00,  
+//        0, 0, 1, 0.00,  
+//        0, 0, 0, 1.00 };
+//      glMultMatrixf(mt);
+//      gluLookAt(el_auto.x,el_auto.y,15, el_auto.x,el_auto.y,0, 0,1,0);
+      
+      gluLookAt(el_auto.x,el_auto.y,15, el_auto.x,el_auto.y,0, cos(el_auto.ang),sin(el_auto.ang),0);
       
     } else {
-      
-      OSD << "FALTA IMPLEMENTAR EL LOOKAT PARA ESTA VISTA" << '\n';
+      ///OSD << "FALTA IMPLEMENTAR EL LOOKAT PARA ESTA VISTA" << '\n';
       /// @TODO: Ubicar correctamente la camara con gluLookAt, (y ver qué pasa con la luz cuando el auto se meuve)
+      //gluLookAt( eyex, eyey, eyez, centerx, centery, centerz, upx, upy, upz );
+      /// z=3.5 se rota con respecto al angulo del auto
+      ///la posicion del ojo va cambiando a medida que el auto se mueve, pero el centro queda en el mismo lugar
+      ///el eyey rota hacia -y, como circunferencia, y el ejex hacia +x
+      gluLookAt(el_auto.x-5*cos(el_auto.ang),el_auto.y+5*sin(-el_auto.ang),3.5, el_auto.x,el_auto.y,0, 0,0,1);
       
+      ///la luz va rotando si la vista trasera tambien rota, de modo que no quede estática
+      glLightfv(GL_LIGHT0,GL_POSITION,lpos);  // ubica la luz
     }
     
   } else {
@@ -112,7 +124,6 @@ void Display_cb() { // Este tiene que estar
     gluLookAt(dist_cam*eye[0],dist_cam*eye[1],dist_cam*eye[2],0,0,0,up[0],up[1],up[2]);
   
   }
-  
   drawObjects(animado,lod);
   glPopMatrix();
 
