@@ -10,6 +10,7 @@
 #endif
 #include "raster_algs.hpp"
 
+
 void draw_line(Point p0, Point p1) {
     /// @TODO: implementar algun algoritmo de rasterizacion de segmentos
     glBegin(GL_POINTS);
@@ -17,33 +18,34 @@ void draw_line(Point p0, Point p1) {
     glColor4f(0,0,0,.5);
     float dy = (p1.y-p0.y);
     float dx = (p1.x-p0.x);
-       
-    if(abs(dx) < abs(dy)) {
-        if(dy < 0){
-            Point aux = p0;
-            p0 = p1;
-            p1 = aux;
-        }
-        float m = dx/dy;
-        for( Point p = p0; p.y <= p1.y; ++p.y) {
-            glVertex2f(p.x,redon(p.y));
-            p.x+= m;
-        }
-    }else{
-        if(dx < 0){
-            Point aux = p0;
-            p0 = p1;
-            p1 = aux;
-        }
-        
-        float m = dy/dx;
+    //Como se si la curva es suficientemente suave?
     
-        for( Point p = p0; p.x <= p1.x; ++p.x) {
-            glVertex2f(redon(p.x),p.y);
-            p.y+= m;
+    if(abs(dx) < abs(dy)) {
+        if(dy!=0){
+            if(dy < 0){
+                std::swap(p0,p1);
+            }
+                
+            float m = dx/dy;
+            for( Point p = p0; p.y <= p1.y; ++p.y) {
+                glVertex2f(p.x,redon(p.y));
+                p.x+= m;
+            }    
+        }    
+    }else{
+        if(dx!=0){
+            if(dx < 0){
+                std::swap(p0,p1);
+            }
+        
+            float m = dy/dx;
+    
+            for( Point p = p0; p.x <= p1.x; ++p.x) {
+                glVertex2f(redon(p.x),p.y);
+                p.y+= m;
+            }
         }
     }
-        
     glEnd();
 }
 
