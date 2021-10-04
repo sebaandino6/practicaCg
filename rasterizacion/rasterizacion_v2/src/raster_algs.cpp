@@ -14,38 +14,44 @@
 void draw_line(Point p0, Point p1) {
     /// @TODO: implementar algun algoritmo de rasterizacion de segmentos
     glBegin(GL_POINTS);
-       
+   
     glColor4f(0,0,0,.5);
-    float dy = (p1.y-p0.y);
-    float dx = (p1.x-p0.x);
+       
+    //DDA
+//    float dy = (p1.y-p0.y);
+//    float dx = (p1.x-p0.x);
     //Como se si la curva es suficientemente suave?
+//    
+//    if(abs(dx) < abs(dy)) {
+//        if(dy!=0){
+//            if(dy < 0){
+//                std::swap(p0,p1);
+//            }
+//                
+//            float m = dx/dy;
+//            for( Point p = p0; p.y <= p1.y; ++p.y) {
+//                glVertex2f(p.x,redon(p.y));
+//                p.x+= m;
+//            }    
+//        }    
+//    }else{
+//        if(dx!=0){
+//            if(dx < 0){
+//                std::swap(p0,p1);
+//            }
+//        
+//            float m = dy/dx;
+//    
+//            for( Point p = p0; p.x <= p1.x; ++p.x) {
+//                glVertex2f(redon(p.x),p.y);
+//                p.y+= m;
+//            }
+//        }
+//    }
     
-    if(abs(dx) < abs(dy)) {
-        if(dy!=0){
-            if(dy < 0){
-                std::swap(p0,p1);
-            }
-                
-            float m = dx/dy;
-            for( Point p = p0; p.y <= p1.y; ++p.y) {
-                glVertex2f(p.x,redon(p.y));
-                p.x+= m;
-            }    
-        }    
-    }else{
-        if(dx!=0){
-            if(dx < 0){
-                std::swap(p0,p1);
-            }
-        
-            float m = dy/dx;
-    
-            for( Point p = p0; p.x <= p1.x; ++p.x) {
-                glVertex2f(redon(p.x),p.y);
-                p.y+= m;
-            }
-        }
-    }
+    //Bresenham
+        float dy = (p1.y-p0.y);
+        float dx = (p1.x-p0.x);
     glEnd();
 }
 
