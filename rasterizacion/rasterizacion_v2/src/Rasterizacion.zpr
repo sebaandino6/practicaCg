@@ -21,11 +21,7 @@ path=main.cpp
 cursor=34:21
 [source]
 path=raster_algs.cpp
-<<<<<<< HEAD
-cursor=20:51
-=======
-cursor=36:12
->>>>>>> 049af433a3ca308a98015aca60ae3b28e1a81bfa
+cursor=59:28
 open=true
 [header]
 path=raster_algs.hpp
