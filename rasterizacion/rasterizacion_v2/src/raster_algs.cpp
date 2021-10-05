@@ -86,8 +86,6 @@ void bresenham_line(Point p0, Point p1) {
             p.y+= di; 
             pasoDi = pasoDi - dx;
         }
-        
-        
     }
 }
 
@@ -99,7 +97,7 @@ void draw_line(Point p0, Point p1) {
     glColor4f(0,0,0,.5);
       
     //dda_line(p0, p1);
-    bresenham_line(p0, p1);
+    //bresenham_line(p0, p1);
 
     glEnd();
 }
