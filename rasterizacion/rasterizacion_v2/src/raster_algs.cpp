@@ -10,113 +10,100 @@
 #endif
 #include "raster_algs.hpp"
 
+void dda_line(Point p0, Point p1) {
+    
+    float dy = (p1.y-p0.y);
+    float dx = (p1.x-p0.x);
+    //     Como se si la curva es suficientemente suave?
+    if(abs(dx) < abs(dy)) {
+        if(dy!=0){
+            if(dy < 0){
+                std::swap(p0,p1);
+            }
+            float m = dx/dy;
+            for( Point p = p0; p.y <= p1.y; ++p.y) {
+                glVertex2f(p.x,redon(p.y));
+                p.x+= m;
+            }    
+        }    
+    }else{
+        if(dx!=0){
+            if(dx < 0){
+                std::swap(p0,p1);
+            }
+            
+            float m = dy/dx;
+            
+            for( Point p = p0; p.x <= p1.x; ++p.x) {
+                glVertex2f(redon(p.x),p.y);
+                p.y+= m;
+            }
+        }
+    }
+}
+
+void bresenham_line(Point p0, Point p1) {
+    
+    float dy; 
+    float dx;
+    float di;
+    float pasoDi;
+    float m;
+    dy = abs(p1.y-p0.y);
+    dx = (p1.x-p0.x);
+    bool prueba = abs(dx) < abs(dy);
+    Point p;
+    
+    if(prueba == true) {
+        std::swap(p0.x, p0.y);
+        std::swap(p1.x, p1.y);
+    }
+    
+    if(p0.x > p1.x) {
+        std::swap(p0, p1);        
+    }
+    
+    if(p0.y > p1.y) {
+        di = -1; 
+    }else{
+        di = 1;
+    }
+    
+    dy = abs(p1.y-p0.y);
+    dx = (p1.x-p0.x);
+    p.y = p0.y;
+    pasoDi = 0;
+    for (p.x = p0.x; p.x < p1.x; p.x++) {
+        if(prueba == true) {
+            glVertex2f(p.y,p.x);
+        }else{
+            glVertex2f(p.x,p.y);
+        }
+        
+        pasoDi+= dy;
+        
+        if(2*pasoDi >= dx) {
+            p.y+= di; 
+            pasoDi = pasoDi - dx;
+        }
+        
+        
+    }
+}
+
+
 void draw_line(Point p0, Point p1) {
     /// @TODO: implementar algun algoritmo de rasterizacion de segmentos
     glBegin(GL_POINTS);
     
     glColor4f(0,0,0,.5);
-    
-    // Bresenham
-    float dy = (p1.y-p0.y);
-    float dx = (p1.x-p0.x);
-//    float di;
-    float m;
-    float pasoDi;
-    
-    // Como se si la curva es suficientemente suave?
-    
-    if(abs(dx) < abs(dy)) {
-        
-        if(dy < 0){
-            std::swap(p0,p1);
-        }
-        
-        for( Point p = p0; p.y <= p1.y; ++p.y) {
-            //acÃ¡ deberÃ­a tener un while
-        }       
-        
-    } else {
-        if (dx >=0) {
-            //x avanza de a 1
-            m = dx/dy;
-       
-            if(dx == 0) {
-                glVertex2f(p0.x,p0.y);
-            } 
-                
-            //pinto el primer pixel
-            glVertex2f(p0.x,p0.y);
-            //debo avanzar en un pixel
-            
-            //esto va acà???
-            float di = 0;
-            float paso = (2*dx*di) ;
-            //esto por que?
-            Point p = p0;
-            
-            while(p.x < p1.x){
-                    
-                float h = di + m;
-    
-                if( (paso + (2*dy) - dx) < 0) {
-                    //Pinto E
-                    glVertex2f(p.x+1, p.y);
-                    di += h;
-                    //probablemente esto sea lo que tenga que sacar afuera.
-                    paso += 2*dy;  
-                }else{
-                    //Pinto NE
-                    glVertex2f(p.x+1, p.y+1);
-                    di += h - 1;
-                    //este paso tengo que sacar afuera
-                    paso += 2*dy - 2*dx;
-                }
-                    
-                if(di == 0){
-                    glVertex2f(p.x,p.y);
-                    paso = 0;
-                }
-                    
-                di = paso;
-                //acà deberìa incrementar p.x en 1
-            }
-        }
-    }
-    // END BRESEMHAM
-    
-    
-    // DDA
-//        float dy = (p1.y-p0.y);
-//        float dx = (p1.x-p0.x);
-    // Como se si la curva es suficientemente suave?
-//        if(abs(dx) < abs(dy)) {
-//            if(dy!=0){
-//                if(dy < 0){
-//                    std::swap(p0,p1);
-//                }
-//                float m = dx/dy;
-//                for( Point p = p0; p.y <= p1.y; ++p.y) {
-//                    glVertex2f(p.x,redon(p.y));
-//                    p.x+= m;
-//                }    
-//            }    
-//        }else{
-//            if(dx!=0){
-//                if(dx < 0){
-//                    std::swap(p0,p1);
-//                }
-//            
-//                float m = dy/dx;
-//        
-//                for( Point p = p0; p.x <= p1.x; ++p.x) {
-//                    glVertex2f(redon(p.x),p.y);
-//                    p.y+= m;
-//                }
-//            }
-//        }
-    // END DDA
+      
+    //dda_line(p0, p1);
+    bresenham_line(p0, p1);
+
     glEnd();
 }
+
 
 static float distance(Point a, Point b) {
     int dx = a.x-b.x, dy = a.y-b.y;
