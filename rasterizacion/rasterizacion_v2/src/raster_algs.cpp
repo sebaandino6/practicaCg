@@ -14,7 +14,7 @@ void dda_line(Point p0, Point p1) {
     
     float dy = (p1.y-p0.y);
     float dx = (p1.x-p0.x);
-    //     Como se si la curva es suficientemente suave?
+
     if(abs(dx) < abs(dy)) {
         if(dy!=0){
             if(dy < 0){
@@ -96,8 +96,8 @@ void draw_line(Point p0, Point p1) {
     glBegin(GL_POINTS);
     glColor4f(0,0,0,.5);
       
-    //dda_line(p0, p1);
-    bresenham_line(p0, p1);
+   // dda_line(p0, p1);
+    //bresenham_line(p0, p1);
     glEnd();
 }
 
@@ -118,11 +118,10 @@ void subdivision(curve_func_t f, float A,float B){
     float distancia = distance( puntoC.p, puntoM) ;
     if( abs( distancia) < 0.5 ){ ///si la distancia de C a M es menor a medio pixel
         ///dibujo la linea entre el punto A y el punto B
-//        glBegin(GL_LINES);
-//        glVertex2f( redon(puntoA.p.x) , redon(puntoA.p.y) );   ///el punto A
-//        glVertex2f( redon(puntoB.p.x) , redon(puntoB.p.y) );   ///el punto B
-//        glEnd();
-        bresenham_line(puntoA.p, puntoB.p);
+        glVertex2f( redon(puntoA.p.x) , redon(puntoA.p.y) );   ///el punto A
+        glVertex2f( redon(puntoB.p.x) , redon(puntoB.p.y) );   ///el punto B
+            
+        //bresenham_line(puntoA.p, puntoB.p);
     }else{
         /*se almacena el par (C,tm) entremedio de A y B: next(A,ta) = (C,tm) y 
         next(C,tm) = (B,tb) repitiendo el tramo. El proceso termina
@@ -142,31 +141,38 @@ void dda_curva(curve_func_t f) {
     while( t < 1 ){
             
         auto puntoA = f(t); //punto 0
+        //poner un if si el diferencial es cero
         float diferencial = 1 / abs(std::max( puntoA.d.x , puntoA.d.y ));    //aumento de t
         t+=diferencial; //aumento t
-        auto puntoB = f(t); ///punto siguiente
-            
-            //si alguno de los dos valores es igual se estaria pintando el mismo lugar dos veces
+        
+        auto puntoB = f(t); //punto siguiente
+        
+        //reemplazar el if con un while
+        //no salto mas de un pixel, evito que se genere una desconexion de un pixel
+        if( abs(redon(puntoB.p.x) - redon(puntoA.p.x) ) > 1 ){
+            t = t - diferencial/2;
+            puntoB = f(t); //punto siguiente
+        }else if( abs(redon(puntoB.p.y) - redon(puntoA.p.y)) > 1){
+            t = t - diferencial/2;
+            puntoB = f(t); //punto siguiente
+        }
+                        
+        //si alguno de los dos valores es igual se estaria pintando el mismo lugar dos veces
         if( redon(puntoB.p.x) != redon(puntoA.p.x) ){ 
-            glVertex2f( redon(puntoA.p.x) , redon(puntoB.p.y) );///pinto el puntoA           
+            glVertex2f( redon(puntoA.p.x) , redon(puntoB.p.y) );//pinto el puntoA           
         }else if( redon(puntoB.p.y) != redon(puntoA.p.y) ){
             glVertex2f( redon(puntoA.p.x) , redon(puntoB.p.y) );
         }
-            //no salto mas de un pixel, evito que se genere una desconexion de un pixel
-        if( abs(redon(puntoB.p.x) - redon(puntoA.p.x) ) > 1 ){
-            t = t - diferencial/2;
-            }else if( abs(redon(puntoB.p.y) - redon(puntoA.p.y)) > 1){
-                t = t - diferencial/2;
-            }
-        }
+    }
 }
 
 void draw_curve(curve_func_t f) {
     glBegin(GL_POINTS);
-    //subdivision(f,0,1);
     dda_curva(f);
-   
     glEnd();
+//    glBegin(GL_LINES);
+//    subdivision(f,0,1);
+//    glEnd();
 }
 
 
