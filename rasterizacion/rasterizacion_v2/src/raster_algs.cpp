@@ -144,7 +144,7 @@ void draw_curve(curve_func_t f) {
     // entonces r.p es el punto (tipo Point) y r.d la derivada (tipo Vector)
     
     ///SUBDIVISION
-//    subdivision(f,0,1);
+    subdivision(f,0,1);
         
     ///BEZIER RASTERING
 //    float t=0;
