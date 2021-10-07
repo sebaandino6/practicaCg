@@ -52,8 +52,8 @@ void drawAuto(int lod) {
   ///ROTACION CUANDO ESTA GIRANDO EL AUTO Y POSICIONA LA RUEDA
   float mtr12[] ={  cos(-el_auto.rang1), -sin(-el_auto.rang1), 0, 0.00,
                     sin(-el_auto.rang1), cos(-el_auto.rang1) , 0, 0.00,
-                    0                 , 0                  , 1, 0.00,
-                    0.48              , 0.28               , 0, 1.00
+                    0                  , 0                   , 1, 0.00,
+                    0.48               , 0.28                , 0, 1.00
   };
   glMultMatrixf(mtr12);
   glMultMatrixf(mtr1);
@@ -114,10 +114,14 @@ void drawAuto(int lod) {
   
     ///lado derecho
   glPushMatrix();
-  float mttd[] = {  0    , 0.2 , 0   , 0.00,
-                    -0.35, 0   , 0   , 0.00,
-                    0    , 0   , 0.05, 0.00,
-                    0    , 0.25, 0.01, 1.00
+  float mttd[] = {  
+    0.35, 0    , 0   , 0.00,
+      0   , -0.2  , 0   , 0.00,
+      0   , 0    , 0.05, 0.00,
+      0   , 0.25, 0.01, 1.00
+    
+      
+    
   };
   glMultMatrixf(mttd);
   drawToma(); // x2 (izquierda y derecha, "espejadas")
@@ -140,7 +144,7 @@ void drawAuto(int lod) {
   ///delantero
   glPushMatrix();
   float mtaleron1[] = { 0.1, 0, 0, 0.00,
-                        0, 0.3, 0, 0.00,
+                        0  , 0.3, 0, 0.00,
                         0, 0, 0.03, 0.00,
                         0.8, 0, 0, 1.00
   };
@@ -162,10 +166,10 @@ void drawAuto(int lod) {
 ///Intente escalar y posicionar la esfera que simula el casco del piloto determinando usted un tamaño 
 ///  y una posicion adecuados.
   glPushMatrix();
-  float mtEsfera[] ={ 0.15, 0, 0, 0.00,
-                      0, 0.15, 0, 0.00,
-                      0, 0, 0.15, 0.00,
-                      0, 0, 0, 1.00
+  float mtEsfera[] ={ 0.1, 0   , 0   , 0.00,
+                      0   , 0.1, 0   , 0.00,
+                      0   , 0   , 0.1, 0.00,
+                      0   , 0   , 0.1,  1.00
   };
   glMultMatrixf(mtEsfera);
   drawCasco(lod);
