@@ -18,7 +18,7 @@ current_source=visibilidad.cpp
 path_char=/
 [source]
 path=visibilidad.cpp
-cursor=72:17
+cursor=29:29
 open=true
 [config]
 name=Debug_Linux
