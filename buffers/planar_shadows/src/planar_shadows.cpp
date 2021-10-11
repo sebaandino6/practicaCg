@@ -58,6 +58,7 @@ void buildStencil(){
 	
 //  @@@ Dibujar en el stencil los objetos necesarios.
 //	Para proyectar la tetera en el piso usar la matriz shadowMatrix
+	//i think here i draw project matrix in stencil buffer
 	glPopAttrib();
 }
 
