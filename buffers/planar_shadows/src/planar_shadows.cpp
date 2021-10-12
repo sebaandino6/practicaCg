@@ -100,14 +100,41 @@ void Display_cb() {
 	
 	buildStencil(); 
 	
-//	@@@: Utilizar el stencil para que los reflejos no se vean fuera del piso
+	//	@@@: Utilizar el stencil para que los reflejos no se vean fuera del piso
+	// to do that i use that guide 
+	// -> http://nehe.gamedev.net/tutorial/clipping__reflections_using_the_stencil_buffer/17004/
+	double clip_plane[]= {
+		0.f,-1.f,0.f,0.f
+	};
+	glColorMask(0,0,0,0);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS,1,1);
+	glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glDisable(GL_DEPTH_TEST); // La sombra se genera dibujando el piso con al iluminación deshabilitada
+	drawFloor();
+	glPopAttrib();
+	
+	glEnable(GL_DEPTH_TEST);
+	glColorMask(1,1,1,1);
+	glStencilFunc(GL_EQUAL,1,1);
+	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+	
+	glEnable(GL_CLIP_PLANE0);
+	glClipPlane(GL_CLIP_PLANE0, clip_plane);
+	
+	
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glPushMatrix();
 	glScalef(1.f,-1.f,1.f);
+	
 	drawTeapots(tiempo);
 	drawLight(lpos);
 	glPopMatrix();
 	glPopAttrib();
+	
+	glDisable(GL_CLIP_PLANE0);
+	glDisable(GL_STENCIL_TEST);
 	
 //  @@@ Utilizar el stencil para que el piso iluminado se dibuje solo donde
 //  no hay sombra (de otra forma se superpone piso iluminado+sombra)
