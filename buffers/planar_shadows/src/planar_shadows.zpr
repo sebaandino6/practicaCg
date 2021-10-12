@@ -18,12 +18,11 @@ current_source=planar_shadows.cpp
 path_char=/
 [source]
 path=planar_shadows.cpp
-cursor=104:4
+cursor=65:1
 open=true
 [header]
 path=drawObjects.h
-cursor=85:37
-open=true
+cursor=83:25
 [config]
 name=Debug_Linux
 toolchain=
