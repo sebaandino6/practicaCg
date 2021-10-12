@@ -58,6 +58,23 @@ void buildStencil(){
 	
 //  @@@ Dibujar en el stencil los objetos necesarios.
 //	Para proyectar la tetera en el piso usar la matriz shadowMatrix
+	
+	/** i think here draw in the stencil buffer **/
+	// what the values of glStencilOp??glStencilOp(GL_KEEP,GL_KEEP, GL_REPLACE)??
+	// what the values of glStencilFunc??glStencilFunc(GL_EQUAL, 1, 0xFF)?
+	//how to draw the projected object in the stencil buffer with no change color buffer????
+	// i think we have to multiply shadowMatrix and then draw the teapot.
+	glEnable(GL_STENCIL_TEST);    
+	glStencilMask(0xFF); 
+	glStencilOp(GL_KEEP,GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_EQUAL, 1, 0xFF);
+	
+	glPushMatrix();
+		glMultMatrixf((GLfloat *)shadowMatrix);
+		drawTeapots(tiempo);
+	glPopMatrix();
+	/** i think here draw in the stencil buffer **/
+	
 	glPopAttrib();
 }
 
@@ -139,6 +156,7 @@ void Display_cb() {
 //  @@@ Utilizar el stencil para que el piso iluminado se dibuje solo donde
 //  no hay sombra (de otra forma se superpone piso iluminado+sombra)
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	//here is where draw the scene in normal form
 	drawFloor();
 	glPopAttrib();
 	drawTeapots(tiempo);
