@@ -3,3 +3,6 @@ practicaTransformaciones/f1/bin/*
 
 # ignore debug files
 practicaTransformaciones/f1/tmp/*
+
+# ignore ide files
+*.swp
