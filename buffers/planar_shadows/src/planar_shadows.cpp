@@ -193,8 +193,8 @@ void regen() {
 	glLoadIdentity();
 	
 //  @@@ Resolver problemas de Z-fighting (ver variable "distancia")
-	double znear= 0.0001,
-		   zfar = 3000;
+	double znear= 0.5,
+		   zfar = 30;
 	
 	gluPerspective(fovy, float(w) / float(h), znear, zfar);
 	
