@@ -7,7 +7,7 @@ macros_file=
 default_fext_source=cpp
 default_fext_header=h
 autocomp_extra=OpenGL_gl OpenGL_glu OpenGL_glut OpenGL_glx
-active_configuration=Debug_Win32
+active_configuration=Debug_Linux
 version_saved=20191006
 version_required=20140318
 tab_width=2
@@ -18,7 +18,7 @@ current_source=visibilidad.cpp
 path_char=\
 [source]
 path=visibilidad.cpp
-cursor=90:48
+cursor=463:0
 open=true
 [config]
 name=Debug_Linux
