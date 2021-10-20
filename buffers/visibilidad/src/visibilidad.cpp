@@ -65,13 +65,13 @@ void drawObjects(){
     ///si tiene relleno dibuja la tetera con el relleno (color)
     glEnable(GL_LIGHTING);
     if (tetera)      glutSolidTeapot(1);
-    else       glutSolidIcosahedron();
+    else glutSolidIcosahedron();
   }
   else{
     ///si no tiene relleno dibujo el objeto pero sin color
     ///desactivo los colores con la mascara glColorMask(R,G,B,A), luego dibujo
-//    if (tetera) glutWireTeapot(1);
-//    else glutWireIcosahedron();
+    if (tetera) glutWireTeapot(1);
+    else glutWireIcosahedron();
     glColorMask(false,false,false,true);
       if (tetera) glutSolidTeapot(1);
       else glutSolidIcosahedron();
