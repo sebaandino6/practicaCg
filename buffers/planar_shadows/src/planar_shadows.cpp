@@ -81,7 +81,7 @@ void buildStencil(){
 	glPopAttrib();
 }
 
-
+	
 void showStencil(unsigned char val, float r, float g, float b) {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glStencilFunc(GL_EQUAL, val, ~0);
