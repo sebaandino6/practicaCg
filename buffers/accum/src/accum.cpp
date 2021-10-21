@@ -99,9 +99,11 @@ void Display_cb() {
     glClearAccum(d*fondo[0],d*fondo[1],d*fondo[2],d*fondo[3]);
     glClear(GL_ACCUM_BUFFER_BIT); // 10% (1-persistencia) de color de fondo
     // Suma 90% (persistencia) de lo que hay en el front al de acumulacion
-    // (el buffer default para escritira, lectura y transferencia es el back)
+    // (el buffer default para escritura, lectura y transferencia es el back)
     glReadBuffer(GL_FRONT); glAccum(GL_ACCUM,persistencia); glReadBuffer(GL_BACK);
     // transfiere el resultado al back (default de escritura)
+	//como cambia ese valor 1 al resultado de la imagen?
+	//hay que entender ese valor 1
     glAccum(GL_RETURN,1);
     glClear(GL_DEPTH_BUFFER_BIT); // solo borra el depth (z=zfar)
     drawObjects();// dibuja en el backbuffer, pero sobre lo que había 
