@@ -128,7 +128,7 @@ void Display_cb() {
 		glPushMatrix();
 			glEnable(GL_STENCIL_TEST);	///reflejo
 			glStencilFunc(GL_EQUAL,1,~0);///los que pasaron el test tienen 1 en el buffer
-//			glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);///mantengo aquellos que pasen el test, los que esten sobre el piso
+			glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);///mantengo aquellos que pasen el test, los que esten sobre el piso
 			glScalef(1.f,-1.f,1.f);
 			drawTeapots(tiempo);
 			drawLight(lpos);
