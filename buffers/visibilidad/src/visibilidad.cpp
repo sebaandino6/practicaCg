@@ -58,22 +58,57 @@ static int ms_i=4,msecs=ms_lista[ms_i]; // milisegundos por frame
 // Dibuje las líneas delanteras gruesas y las traseras finas 
 void drawObjects(){
   glPushAttrib(GL_ALL_ATTRIB_BITS);
-  if (tetera) glFrontFace(GL_CW); // la tetera esta definida CW
-  else glFrontFace(GL_CCW); // estándar
+  if (tetera)    glFrontFace(GL_CW); // la tetera esta definida CW
+  else     glFrontFace(GL_CCW); // estándar
   
-  if (relleno) {
+  if (relleno) {  
+    ///si tiene relleno dibuja la tetera con el relleno (color)
     glEnable(GL_LIGHTING);
-    if (tetera) glutSolidTeapot(1);
+    if (tetera)      glutSolidTeapot(1);
     else glutSolidIcosahedron();
   }
-  // lineas
+  else{
+    ///si no tiene relleno dibujo el objeto pero sin color
+    ///desactivo los colores con la mascara glColorMask(R,G,B,A), luego dibujo
+    if (tetera) glutWireTeapot(1);
+    else glutWireIcosahedron();
+    glColorMask(false,false,false,true);
+      if (tetera) glutSolidTeapot(1);
+      else glutSolidIcosahedron();
+    ///coloco los colores nuemente en la mascara de color
+    glColorMask(true,true,true,true);
+  }
+  
+  /// lineas
   glDisable(GL_LIGHTING); // lineas sin material
   glColor4fv(line_color); // color de lineas
-  if (wire) {
-    glLineWidth(2); // espesor de lineas gruesas
-      if (tetera) glutWireTeapot(1);
-      else glutWireIcosahedron();
+  
+  ///habilito el test profunidad
+  glEnable(GL_DEPTH_TEST);
+
+  ///LINEAS DELANTERA 
+  glDepthFunc(GL_LESS); /// if ( pixel < pixelBuffer)
+  if (wire) { ///dibuja las lineas que se veran de la tetera
+    glLineWidth(5); /// espesor de lineas delanteras -> 4
+      if (tetera)         glutWireTeapot(1);
+      else        glutWireIcosahedron();
   }
+  
+  ///LINEAS TRASERAS
+  glDepthFunc(GL_GREATER);  ///if (pixel > pixelBuffer)
+  glEnable(GL_POLYGON_OFFSET_FILL); 
+//  glPolygonOffset(1,1);
+//  glPolygonOffset(0,10000);
+  if (wire) {
+    glLineWidth(1); /// espesor de lineas traseras -> 1
+    glEnable(GL_LINE_STIPPLE); 
+    glLineStipple(1, 0x00FF );
+    if (tetera) 
+      glutWireTeapot(1);
+    else
+      glutWireIcosahedron();
+  }
+  glPopAttrib();
 }
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -428,8 +463,8 @@ void initialize() {
   // ========================
 
   glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LEQUAL); // habilita el z-buffer
-  glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(1,1); // coplanaridad
-
+  glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(0,10000); // coplanaridad
+  ///se cambio el valor del glPolygonOffset( factor, units )
   // color de fondo
   glClearColor(fondo[0],fondo[1],fondo[2],fondo[3]);
 

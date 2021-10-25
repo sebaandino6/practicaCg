@@ -7,7 +7,6 @@ practicaTransformaciones/f1/tmp/*
 # ignore ide files
 *.swp
 
-
 # ignore .bin and .o files
 *.bin
 *.o

@@ -18,7 +18,7 @@ current_source=accum.cpp
 path_char=/
 [source]
 path=accum.cpp
-cursor=106:21
+cursor=97:13
 open=true
 [config]
 name=Debug_Linux
