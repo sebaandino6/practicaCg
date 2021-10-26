@@ -23,3 +23,10 @@ solucionarlo?
 
 Yo creo que poligonoffset no tiene nada que ver.
 Puede ser por el clamping o repeat. O también puede ser por una imagen de textura mal hecha.
+
+Pregunta 3:
+'''''''''''
+
+Finalmente ¿No les parece mal esa imagen de textura? En términos de eficienc ia ¿Cómo la mejorarían?
+
+Creo que la imagen puede cambiar los cuadrados de las caras laterales, osea los ladrillos, se puede tener un solo cuadrado con la textura de los ladrillos y repetirlo en las demás caras.
