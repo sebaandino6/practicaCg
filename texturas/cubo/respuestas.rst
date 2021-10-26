@@ -6,6 +6,13 @@ Respuestas a los ejercicios
 Ejercicio cubo
 --------------
 
+Preunta 1
+'''''''''
+
+Notar también, que la transparencia y el z-buffer siguen trayendo problemas; pero, dado que hay una sola
+cara con transparencia, el problema se resuelve fácilmente. (¿cómo?)
+
+Hay que poner la reja a ultimo momento.
 
 Pregunta 2:
 '''''''''''
