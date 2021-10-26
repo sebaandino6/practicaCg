@@ -66,9 +66,6 @@ void drawColorCube(){
     
     */
     
-    
-    
-    
     //glTexCoord2i(0,0); //1 hecho
     glTexCoord2d(3.f/4,1.f/3); glColor3f(0,0,0); glVertex3i(0,0,0); 
     glTexCoord2d(3.f/4,2.f/3); glColor3f(0,1,0); glVertex3i(0,1,0);
@@ -87,8 +84,6 @@ void drawColorCube(){
     glTexCoord2d(1.f/4,1.f/3); glColor3f(1,0,1); glVertex3i(1,0,1);
     glTexCoord2d(0.f/4,1.f/3); glColor3f(0,0,1); glVertex3i(0,0,1);
     
-    
-    
     //r=0 normal hacia -r  //5  hecho
     glTexCoord2d(0.f/4,1.f/3); glColor3f(0,0,0); glVertex3i(0,0,0);
     glTexCoord2d(1.f/4,1.f/3); glColor3f(0,0,1); glVertex3i(0,0,1);
@@ -101,24 +96,11 @@ void drawColorCube(){
     glTexCoord2d(1.f/4,2.f/3); glColor3f(1,1,1); glVertex3i(1,1,1);
     glTexCoord2d(1.f/4,1.f/3); glColor3f(1,0,1); glVertex3i(1,0,1);
     
-    
-    
     //g=1 normal hacia +g  //4  reja caviado de lugar
     glTexCoord2d(0.f/4,2.f/3); glColor3f(0,1,0); glVertex3i(0,1,0);
     glTexCoord2d(1.f/4,2.f/3); glColor3f(0,1,1); glVertex3i(0,1,1);
     glTexCoord2d(1.f/4,1.f); glColor3f(1,1,1); glVertex3i(1,1,1);
     glTexCoord2d(0.f/4,1.f); glColor3f(1,1,0); glVertex3i(1,1,0);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     glEnd();
   }
