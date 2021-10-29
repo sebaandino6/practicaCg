@@ -24,3 +24,44 @@ editar el struct "tex_settings" durante la ejecución. Al iniciar la depuración
 veran las instrucciones.
 
 
+wrap: 
+    -ClampToBorder: corta en donde termina la textura
+    -ClampToEdge: corta donde termina la textura pero continua con el ultimo texel?
+    -Repeat: repite la textura para cubrir todo el objeto
+    -MirroredRepeat: lo mismo que repeat pero espejado
+    
+gen_mode:
+    -SphereMap: (mapeo de esfera: depende del punto de vista de la camara) sirve en la tetera y en la bolita, en el circulo no (creo que porque le falta dimensiones para que un circulo sea una esfera), en el cono tampoco, ni en el cilindro, ni hablar en el cuadrado y el cubo
+    
+    -EyeLinear: creo que mapea la textura sobre el objeto desde la direccion de la vista, se deformará un poco dependiendo del objeto. Si ponemos el plano s o el plano t con z=1 entonces no se mapeará nada, creo que es porque la vista esta en el mismo plano que intenta mapear, al no ser perpendicular el plano vista con el de mapeo no se verá nada de la textura
+    
+    -ObjectLinear: (no depende de la posicion de la vista, mapea la textura sobre un objeto de manera que tome la forma de este desde una ubicacion exacta, por eso no depende desde donde se lo vean la textura estará sobre el objeto ) en la que queda bien es en el cuadro y en el cubo, en el resto se deforma mucho.
+    
+    -ReflectionMap: sirve medio como un espejo, donde "reflejará" ciertas parte de las textura dependiendo del objeto y del punto de vista con respecto al objeto, en la esfera se refleja lo mismo, en el circulo refleja solo de un lado
+
+
+Filtros:
+    -Nereast: toma el mas cercano, cuando el objeto esta cerca de la camara la textura queda pixelada, cuando el objeto esta lejos se ve mas clara la textura
+    
+    -Linear: hace un promedio entre los textels mas cercano, cuando el objeto esta mas lejo la textura no queda tan bien se ve borrosa, si se ve bien cuando el objeto esta cerca de la camara y la textura no queda "pixeleada"
+
+    (creo que para cuando se "amplia" el objeto es mejor el linear, y cuando se "achica" el objeto es mejor el nearest )
+    
+Mezclas:
+    -Add: combina el color del material con el de la textura (suma = colorMaterial + colorText)
+    
+    -Blend: combina el color del material con el de tex_env_color solo en donde sea blanco en la textura? mantiene el color del material en donde la textura tenga colores oscuros?
+    
+    -Decal:es como si pegara la textura sobre el objeto y se mantiene los colores del material en donde la textura tiene colores claros, en los lugares donde la textura tiene colores mas claro se nota más el color del fondo (material)
+    
+    -Modulate: combia los colores del material con el de la textura pero más oscuro que el Add (producto = colorMaterial * colorText)
+    
+    -Replace: reemplaza el color del material por la textura, elimina el color directamente (colorText)
+    
+¿cómo combinar textura e iluminación?
+la opción separate_specular habilita la iluminacion.
+con los distintos tipos de mezclas se pueden obtener distintos resultados junto a la iluminacion.
+el Replace solo deja la parte especular de la iluminacion en los puntos donde pega la iluminacion, porque la difusa y la ambiente las reemplaza por el color de la textura.
+Si hacemos la mezcla con Add se nota más la componente especular en los otros puntos cercanos a donde pega la luz directamente.
+
+

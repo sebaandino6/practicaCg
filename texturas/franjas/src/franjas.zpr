@@ -18,7 +18,7 @@ current_source=main.cpp
 path_char=/
 [source]
 path=main.cpp
-cursor=71:71
+cursor=131:13
 open=true
 [source]
 path=drawobjects.cpp
