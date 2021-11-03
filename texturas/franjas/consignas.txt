@@ -1,5 +1,11 @@
 Práctica: Textura y transparencias
+
 Este no es un práctico en el que deban producir código, es solo un ejemplo para mostrarles como se puede utilizar el alpha test sobre los fragmentos con texturas para obtener efectos de invisibilidad en ciertas partes de la imagen.
+
+Alpha test in textures.
+Read https://www.khronos.org/opengl/wiki/Transparency_Sorting
+Read the theory.
+
 
 Con "ctrl" pulsado y click izquierdo del mouse, al moverlo, la posición horizontal define la fase y la vertical la escala de la textura.
 
