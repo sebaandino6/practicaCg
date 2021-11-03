@@ -79,6 +79,7 @@ bool make_texture(){
   for (; i<tsize; i++){img[i]=0;}   // tajos en 0
 
   glBindTexture(GL_TEXTURE_1D, texid);
+  ///esta funcion arma la textura
   glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, tsize, 0, GL_ALPHA, GL_UNSIGNED_BYTE, img);
   return true;
 }
