@@ -4,6 +4,9 @@ practicaTransformaciones/f1/bin/*
 # ignore debug files
 practicaTransformaciones/f1/tmp/*
 
-# exes
+# ignore ide files
+*.swp
+
+# ignore .bin and .o files
 *.bin
 *.o

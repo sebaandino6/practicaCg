@@ -27,41 +27,44 @@ void drawColorCube(){
   if (relleno){
     // caras
     glBegin(GL_QUADS);
-      //b=0 normal hacia -b
-      glTexCoord2d(3.f/4,1.f/3); glColor3f(0,0,0); glVertex3i(0,0,0); 
-      glTexCoord2d(3.f/4,2.f/3); glColor3f(0,1,0); glVertex3i(0,1,0);
-      glTexCoord2d(4.f/4,2.f/3); glColor3f(1,1,0); glVertex3i(1,1,0);
-      glTexCoord2d(4.f/4,1.f/3); glColor3f(1,0,0); glVertex3i(1,0,0);
-
-      //b=1 normal hacia +b
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,0,1); glVertex3i(0,0,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,0,1); glVertex3i(1,0,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,1,1); glVertex3i(1,1,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,1,1); glVertex3i(0,1,1);
-
-      //g=0 normal hacia -g
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,0,0); glVertex3i(0,0,0);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,0,0); glVertex3i(1,0,0);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,0,1); glVertex3i(1,0,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,0,1); glVertex3i(0,0,1);
-
-      //g=1 normal hacia +g
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,1,0); glVertex3i(0,1,0);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,1,1); glVertex3i(0,1,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,1,1); glVertex3i(1,1,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,1,0); glVertex3i(1,1,0);
-
-      //r=0 normal hacia -r
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,0,0); glVertex3i(0,0,0);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,0,1); glVertex3i(0,0,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,1,1); glVertex3i(0,1,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(0,1,0); glVertex3i(0,1,0);
-
-      //r=1 normal hacia +r
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,0,0); glVertex3i(1,0,0);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,1,0); glVertex3i(1,1,0);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,1,1); glVertex3i(1,1,1);
-      glTexCoord2d(0.f/4,0.f/3); glColor3f(1,0,1); glVertex3i(1,0,1);
+    
+    //glTexCoord2i(0,0); //1 hecho
+    glTexCoord2d(3.f/4,1.f/3+0.01); glColor3f(0,0,0); glVertex3i(0,0,0); 
+    glTexCoord2d(3.f/4,2.f/3-0.01); glColor3f(0,1,0); glVertex3i(0,1,0);
+    glTexCoord2d(4.f/4-0.01,2.f/3-0.01); glColor3f(1,1,0); glVertex3i(1,1,0);
+    glTexCoord2d(4.f/4-0.01,1.f/3+0.01); glColor3f(1,0,0); glVertex3i(1,0,0);
+    
+    //b=1 normal hacia +b //2 hecho
+    glTexCoord2d(1.f/4-0.01,1.f/3+0.01); glColor3f(0,0,1); glVertex3i(0,0,1);
+    glTexCoord2d(0.f/4+0.01,1.f/3+0.01); glColor3f(1,0,1); glVertex3i(1,0,1);
+    glTexCoord2d(0.f/4+0.01,2.f/3-0.01); glColor3f(1,1,1); glVertex3i(1,1,1);
+    glTexCoord2d(1.f/4-0.01,2.f/3-0.01); glColor3f(0,1,1); glVertex3i(0,1,1);
+  
+    //pasto
+    //g=0 normal hacia -g //3 hecho
+    glTexCoord2d(0.f/4,0.f/3); glColor3f(0,0,0); glVertex3i(0,0,0);
+    glTexCoord2d(1.f/4-0.01,0.f/3); glColor3f(1,0,0); glVertex3i(1,0,0);
+    glTexCoord2d(1.f/4-0.01,1.f/3+0.01); glColor3f(1,0,1); glVertex3i(1,0,1);
+    glTexCoord2d(0.f/4,1.f/3+0.01); glColor3f(0,0,1); glVertex3i(0,0,1);
+    
+    //r=0 normal hacia -r  //5  hecho
+    glTexCoord2d(0.f/4+0.01,1.f/3+0.01); glColor3f(0,0,0); glVertex3i(0,0,0);
+    glTexCoord2d(1.f/4,1.f/3+0.01); glColor3f(0,0,1); glVertex3i(0,0,1);
+    glTexCoord2d(1.f/4,2.f/3-0.01); glColor3f(0,1,1); glVertex3i(0,1,1);
+    glTexCoord2d(0.f/4+0.01,2.f/3-0.01); glColor3f(0,1,0); glVertex3i(0,1,0);
+    
+    //r=1 normal hacia +r  //6   hecho
+    glTexCoord2d(0.f/4,1.f/3+0.01); glColor3f(1,0,0); glVertex3i(1,0,0);
+    glTexCoord2d(0.f/4,2.f/3-0.01); glColor3f(1,1,0); glVertex3i(1,1,0);
+    glTexCoord2d(1.f/4,2.f/3-0.01); glColor3f(1,1,1); glVertex3i(1,1,1);
+    glTexCoord2d(1.f/4,1.f/3+0.01); glColor3f(1,0,1); glVertex3i(1,0,1);
+    
+    //g=1 normal hacia +g  //4  reja caviado de lugar
+    glTexCoord2d(0.f/4+0.01,2.f/3+0.01); glColor3f(0,1,0); glVertex3i(0,1,0);
+    glTexCoord2d(1.f/4-0.01,2.f/3+0.01); glColor3f(0,1,1); glVertex3i(0,1,1);
+    glTexCoord2d(1.f/4-0.01,1.f-0.01); glColor3f(1,1,1); glVertex3i(1,1,1);
+    glTexCoord2d(0.f/4+0.01,1.f-0.01); glColor3f(1,1,0); glVertex3i(1,1,0);
+    
     glEnd();
   }
   glDisable(GL_LIGHTING); glDisable(GL_TEXTURE_2D);
