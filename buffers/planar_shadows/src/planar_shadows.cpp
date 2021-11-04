@@ -10,7 +10,7 @@ using namespace std;
 // variables globales y defaults
 
 int
-	w=800,h=600, // tamaÒo de la ventana
+	w=800,h=600, // tama√±o de la ventana
 	xm0, ym0,
 	modifierKey;
 float
@@ -48,7 +48,7 @@ void updateShadowMatrix(){
 }
 
 void buildStencil(){
-	// actualizamos la matriz de proyecciÛn de la sombra (la luz se mueve)
+	// actualizamos la matriz de proyecci√≥n de la sombra (la luz se mueve)
 	updateShadowMatrix(); 
 	
 	glPushAttrib(GL_ALL_ATTRIB_BITS); // guardamos los atributos actuales
@@ -58,6 +58,29 @@ void buildStencil(){
 	
 //  @@@ Dibujar en el stencil los objetos necesarios.
 //	Para proyectar la tetera en el piso usar la matriz shadowMatrix
+
+	///		stencil de la sombra
+	///tengo que dibujar en el buffer antes la sombra, luego el piso
+	///habilito el test de stencil
+	glEnable(GL_STENCIL_TEST);	
+	
+	///		stencil del piso
+	///test del stencil 	
+	glStencilFunc(GL_ALWAYS,1,~0);	
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);	///incremento el ref
+	drawFloor();	///dibujo el piso
+	
+	glPushMatrix();
+		///controla el resultado si pasa o falla el test, reemplazo en cualquier caso
+		glStencilOp(GL_KEEP,GL_KEEP,GL_INCR);
+	
+		///test del stencil (0x00 no puede modificar nada, 0xFF puede modificar todo), controla como pasa o falla el test	
+		glStencilFunc(GL_EQUAL,1,~0); ///Passes if ( ref & mask ) = ( stencil & mask ).
+		
+		glMultMatrixf((GLfloat *)shadowMatrix); 	///aca implemento la matriz de la sombra
+		drawTeapots(tiempo);			///dibujo la tetera
+	glPopMatrix();
+	
 	glPopAttrib();
 }
 
@@ -82,7 +105,7 @@ void showStencil(unsigned char val, float r, float g, float b) {
 	glEnd();
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
+	glPopMatrix();	
 	glPopAttrib();
 }
 //------------------------------------------------------------
@@ -96,59 +119,42 @@ void Display_cb() {
 	lpos[1] = -lpos[1];
 	glLightfv(GL_LIGHT0,GL_POSITION,lpos);  // ubica la luz real
 	
-	glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);	///limpia el stencil buffer
 	
 	buildStencil(); 
 	
-	//	@@@: Utilizar el stencil para que los reflejos no se vean fuera del piso
-	// to do that i use that guide 
-	// -> http://nehe.gamedev.net/tutorial/clipping__reflections_using_the_stencil_buffer/17004/
-	double clip_plane[]= {
-		0.f,-1.f,0.f,0.f
-	};
-	glColorMask(0,0,0,0);
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_ALWAYS,1,1);
-	glStencilOp(GL_KEEP,GL_KEEP,GL_REPLACE);
+//	@@@: Utilizar el stencil para que los reflejos no se vean fuera del piso
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glDisable(GL_DEPTH_TEST); // La sombra se genera dibujando el piso con al iluminaciÛn deshabilitada
-	drawFloor();
+		glPushMatrix();
+			glEnable(GL_STENCIL_TEST);	///reflejo
+			glStencilFunc(GL_EQUAL,1,~0);///los que pasaron el test tienen 1 en el buffer
+			glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);///mantengo aquellos que pasen el test, los que esten sobre el piso
+			glScalef(1.f,-1.f,1.f);
+			drawTeapots(tiempo);
+			drawLight(lpos);
+		glPopMatrix();
 	glPopAttrib();
-	
-	glEnable(GL_DEPTH_TEST);
-	glColorMask(1,1,1,1);
-	glStencilFunc(GL_EQUAL,1,1);
-	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-	
-	glEnable(GL_CLIP_PLANE0);
-	glClipPlane(GL_CLIP_PLANE0, clip_plane);
-	
-	
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glPushMatrix();
-	glScalef(1.f,-1.f,1.f);
-	
-	drawTeapots(tiempo);
-	drawLight(lpos);
-	glPopMatrix();
-	glPopAttrib();
-	
-	glDisable(GL_CLIP_PLANE0);
-	glDisable(GL_STENCIL_TEST);
 	
 //  @@@ Utilizar el stencil para que el piso iluminado se dibuje solo donde
 //  no hay sombra (de otra forma se superpone piso iluminado+sombra)
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	drawFloor();
+		glEnable(GL_STENCIL_TEST);	///piso
+		glStencilFunc(GL_NOTEQUAL,2,~0);///los que pasaron el test tienen 1 en el buffer
+		glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);///mantengo aquellos que pasen el test, los otros los descarto
+		drawFloor();
 	glPopAttrib();
 	drawTeapots(tiempo);
 	drawLight(lpos);
 	
 //  @@@ Utilizar el stencil para dibujar la sombra
+		
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glDisable(GL_LIGHTING); // La sombra se genera dibujando el piso con al iluminaciÛn deshabilitada
-	drawFloor();
+		glStencilFunc(GL_EQUAL,2,~0);/// 2 ->  mas luminoso
+		glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);///mantengo aquellos que pasen el test, los otros los descarto
+		glDisable(GL_LIGHTING); // La sombra se genera dibujando el piso con al iluminaci√≥n deshabilitada
+		drawFloor();
 	glPopAttrib();
+	
 	
 	if(showRGBStencil) {
 		showStencil(0, 1,0,0);
@@ -175,6 +181,7 @@ void Display_cb() {
 			cout << "GL_OUT_OF_MEMORY" << endl;
 		errornum=glGetError();
 	}
+	
 }
 
 //------------------------------------------------------------
@@ -186,8 +193,8 @@ void regen() {
 	glLoadIdentity();
 	
 //  @@@ Resolver problemas de Z-fighting (ver variable "distancia")
-	double znear= 0.0001,
-		   zfar = 3000;
+	double znear= 0.5,
+		   zfar = 30;
 	
 	gluPerspective(fovy, float(w) / float(h), znear, zfar);
 	
@@ -310,7 +317,8 @@ void initialize() {
 	glShadeModel(GL_SMOOTH); // interpola normales por nodos o una normal por plano
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(1.,1.);
+	glPolygonOffset(1.,1.);	///como cambiarlo ?
+//	glPolygonOffset(1.,1.);	
 	
 	glEnable(GL_LINE_SMOOTH);
 	

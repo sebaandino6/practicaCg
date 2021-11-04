@@ -1,8 +1,16 @@
-#include <cmath> // sqrt
-#include <cstdlib> // exit (si va, va necesariamente antes del include de glut)
-#include <iostream> // cout
-#include <GL/glut.h>
+// Aplicación de texturas
 
+#include <cmath> // atan sqrt
+#include <cstdlib> // exit
+#include <iostream> // cout
+#include <fstream> // file io
+#ifdef __APPLE__
+# include <OpenGL/gl.h>
+# include <GLUT/glut.h>
+#else
+# include <GL/gl.h>
+# include <GL/glut.h>
+#endif
 /*
 // comentar este bloque si se quiere una ventana de comando
 #ifdef _WIN32
@@ -16,113 +24,94 @@ using namespace std;
 // variables globales y defaults
 
 int
-  w=800,h=600, // tamaño de la ventana
+  w=480,h=360, // tamaño de la ventana
   boton=-1, // boton del mouse clickeado
   xclick,yclick; // x e y cuando clickeo un boton
+
 float // luces y colores en float
-  lambient[]={.3f,.3f,.3f,1.f}, // luz ambiente
-  ldiffuse[]={.7f,.7f,.7f,1.f}, // luz difusa
-  fondo[]={.95f,.95f,.97f,1.f},   // color de fondo
-  face_color[]={.9f,.8f,.7f,.5f}, // color de caras
-  line_color[]={.3f,.2f,.1f,.5f}, // color de lineas
-  escala=200,escala0, // escala de los objetos window/modelo pixeles/unidad
+  line_color[]={.2f,.3f,.4f,1},
+  linewidth=1, // ancho de lineas
+  escala=100,escala0, // escala de los objetos window/modelo pixeles/unidad
   eye[]={0,0,5}, target[]={0,0,0}, up[]={0,1,0}, // camara, mirando hacia y vertical
   znear=2, zfar=8, //clipping planes cercano y alejado de la camara (en 5 => veo de 3 a -3)
-  lpos[]={2,1,5,1}, // posicion luz, l[4]: 0 => direccional -- 1 => posicional
   amy,amy0, // angulo del modelo alrededor del eje y
   ac0,rc0; // angulo resp x y distancia al target de la camara al clickear
 
 bool // variables de estado de este programa
-  tetera=true,     // tetera/icosaedro
-  luz_camara=true,  // luz fija a la camara o al espacio
   perspectiva=true, // perspectiva u ortogonal
   rota=false,       // gira continuamente los objetos respecto de y
   dibuja=true,      // false si esta minimizado
-  wire=true,        // dibuja lineas o no
+  wire=false,       // dibuja lineas o no
   relleno=true,     // dibuja relleno o no
-  cl_info=true;     // informa por la linea de comandos
+  smooth=true,      // normales por nodo o por plano
+  cl_info=false,    // informa por la linea de comandos
+  antialias=false,  // antialiasing
+  blend=false;      // transparencias
 
 short modifiers=0;  // ctrl, alt, shift (de GLUT)
-
-static const double R2G=45/atan(1.0);
+inline short get_modifiers() {return modifiers=(short)glutGetModifiers();}
 
 // temporizador:
 static const int ms_lista[]={1,2,5,10,20,50,100,200,500,1000,2000,5000},ms_n=12;
 static int ms_i=4,msecs=ms_lista[ms_i]; // milisegundos por frame
 
+static const double R2G=45/atan(1.0);
 
-////////////////////////////////////////////////////////////////////////////////////////
-// dibujo
+GLuint texid;
+int texmode=4; // modo de aplicacion de textura
+static const unsigned int texmodelist[]={GL_DECAL,GL_REPLACE,GL_MODULATE,GL_BLEND,0};
+static const char texmodestring[5][20]={"GL_DECAL","GL_REPLACE","GL_MODULATE","GL_BLEND","Sin Textura"};
 
-// @@@@ CONSIGNA
-// Dibuje las líneas delanteras gruesas y las traseras finas 
-void drawObjects(){
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
-  if (tetera)    glFrontFace(GL_CW); // la tetera esta definida CW
-  else     glFrontFace(GL_CCW); // estándar
-  
-  if (relleno) {  
-    ///si tiene relleno dibuja la tetera con el relleno (color)
-    glEnable(GL_LIGHTING);
-    if (tetera)      glutSolidTeapot(1);
-    else glutSolidIcosahedron();
-  }
-  else{
-    ///si no tiene relleno dibujo el objeto pero sin color
-    ///desactivo los colores con la mascara glColorMask(R,G,B,A), luego dibujo
-    if (tetera) glutWireTeapot(1);
-    else glutWireIcosahedron();
-    glColorMask(false,false,false,true);
-      if (tetera) glutSolidTeapot(1);
-      else glutSolidIcosahedron();
-    ///coloco los colores nuemente en la mascara de color
-    glColorMask(true,true,true,true);
-  }
-  
-  /// lineas
-  glDisable(GL_LIGHTING); // lineas sin material
-  glColor4fv(line_color); // color de lineas
-  
-  ///habilito el test profunidad
-  glEnable(GL_DEPTH_TEST);
+// Load a PPM Image
+bool mipmap_ppm(const char *ifile)
+{
+  char dummy; int maxc,wt,ht;
+  ifstream fileinput(ifile, ios::binary);
+  if (!fileinput.is_open()) {cerr<<"ERROR loading texture \""<<ifile<<"\" (file not found)."<<endl; return false;}
+  fileinput.get(dummy);
+  if (dummy!='P') {cerr<<"Not P6 PPM file"<<endl; return false;}
+  fileinput.get(dummy);
+  if (dummy!='6') {cerr<<"Not P6 PPM file"<<endl; return false;}
+  fileinput.get(dummy);
+  dummy=fileinput.peek();
+  if (dummy=='#') do {
+    fileinput.get(dummy);
+  } while (dummy!=10);
+  fileinput >> wt >> ht;
+  fileinput >> maxc;
+  fileinput.get(dummy);
 
-  ///LINEAS DELANTERA 
-  glDepthFunc(GL_LESS); /// if ( pixel < pixelBuffer)
-  if (wire) { ///dibuja las lineas que se veran de la tetera
-    glLineWidth(5); /// espesor de lineas delanteras -> 4
-      if (tetera)         glutWireTeapot(1);
-      else        glutWireIcosahedron();
+  unsigned char *img=new unsigned char[3*wt*ht];
+  fileinput.read((char *)img, 3*wt*ht);
+  fileinput.close();
+  //gluBuild2DMipmaps(GL_TEXTURE_2D, 3, wt, ht,  GL_RGB, GL_UNSIGNED_BYTE, img);
+  // conversion a rgba alpha=255-(r+g+b)/3 (blanco=transparente, negro=opaco)
+  unsigned char *imga=new unsigned char[4*wt*ht];
+  unsigned char r,g,b;
+  for (int i=0;i<wt*ht;i++){
+    r=imga[4*i+0]=img[3*i+0];
+    g=imga[4*i+1]=img[3*i+1];
+    b=imga[4*i+2]=img[3*i+2];
+    imga[4*i+3]=((r+g+b==765)? 0: 255);
+    //imga[4*i+3]=255-(r+g+b)/3;
   }
-  
-  ///LINEAS TRASERAS
-  glDepthFunc(GL_GREATER);  ///if (pixel > pixelBuffer)
-  glEnable(GL_POLYGON_OFFSET_FILL); 
-//  glPolygonOffset(1,1);
-//  glPolygonOffset(0,10000);
-  if (wire) {
-    glLineWidth(1); /// espesor de lineas traseras -> 1
-    glEnable(GL_LINE_STIPPLE); 
-    glLineStipple(1, 0x00FF );
-    if (tetera) 
-      glutWireTeapot(1);
-    else
-      glutWireIcosahedron();
-  }
-  glPopAttrib();
+  delete[] img;
+  gluBuild2DMipmaps(GL_TEXTURE_2D, 4, wt, ht,  GL_RGBA, GL_UNSIGNED_BYTE, imga);
+  delete[] imga;
+  return true;
 }
-////////////////////////////////////////////////////////////////////////////////////////
-
 
 //------------------------------------------------------------
 // redibuja los objetos
+extern void drawColorCube();
 // Cada vez que hace un redisplay
-void Display_cb() {
+void Display_cb() { // Este tiene que estar
 //  if (cl_info) cout << "Display\t"; cout.flush();
   if (!dibuja) return;
   // borra los buffers de pantalla y z
   glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
 
-  drawObjects();
+  drawColorCube();
   glutSwapBuffers();
 
 #ifdef _DEBUG
@@ -177,19 +166,11 @@ void regen() {
   }
 
   glMatrixMode(GL_MODELVIEW); glLoadIdentity(); // matriz del modelo->view
-
-  if (luz_camara) // luz fija a la camara
-    glLightfv(GL_LIGHT0,GL_POSITION,lpos);  // ubica la luz
   gluLookAt(   eye[0],   eye[1],   eye[2],
             target[0],target[1],target[2],
                 up[0],    up[1],    up[2]);// ubica la camara
-
   glRotatef(amy,0,1,0); // rota los objetos alrededor de y
-
-  if (!luz_camara) // luz fija en el espacio del modelo
-    glLightfv(GL_LIGHT0,GL_POSITION,lpos);  // ubica la luz
-
-  glutPostRedisplay();
+  glutPostRedisplay(); // avisa que hay que redibujar
 }
 
 //------------------------------------------------------------
@@ -213,7 +194,7 @@ void Idle_cb() {
     if (lapso<msecs) return;
     suma+=lapso;
     if (++counter==100) {
-      //cout << "<ms/frame>= " << suma/100.0 << endl;
+      cout << "<ms/frame>= " << suma/100.0 << endl;
       counter=suma=0;
     }
     anterior=tiempo;
@@ -244,121 +225,9 @@ void Reshape_cb(int width, int height){
   glViewport(0,0,w,h); // region donde se dibuja
 
   regen(); //regenera la matriz de proyeccion
+  Display_cb();
 }
 
-//------------------------------------------------------------
-// Teclado
-/*
-GLUT ACTIVE SHIFT //Set if the Shift modifier or Caps Lock is active.
-GLUT ACTIVE CTRL //Set if the Ctrl modifier is active.
-GLUT ACTIVE ALT //Set if the Alt modifier is active.
-*/
-inline short get_modifiers() {return modifiers=(short)glutGetModifiers();}
-
-// Maneja pulsaciones del teclado (ASCII keys)
-// x,y posicion del mouse cuando se teclea
-void Keyboard_cb(unsigned char key,int x=0,int y=0) {
-  switch (key){
-    case 27: // escape => exit
-      get_modifiers();
-      if (!modifiers)
-        exit(EXIT_SUCCESS);
-      break;
-    case 'f': case 'F': // relleno
-      relleno=!relleno;
-      if (cl_info) cout << ((relleno)? "Relleno" : "Sin Relleno") << endl;
-      break;
-    case 't': case 'T': // tetea/icosaedro
-      tetera=!tetera;
-      if (cl_info) cout << ((tetera)? "Tetera" : "Icosaedro") << endl;
-      break;
-    case 'i': case 'I': // info
-      cl_info=!cl_info;
-      cout << ((cl_info)? "Info" : "Sin Info") << endl;
-      break;
-    case 'j': case 'J': // luz fija a la camara o en el espacio
-      luz_camara=!luz_camara;
-      if (cl_info)
-        cout << "Luz fija " << ((luz_camara)? "a la camara" : "en el espacio") << endl;
-      regen();
-      break;
-    case 'l': case 'L': // wire
-      wire=!wire;
-      if (cl_info) cout << ((wire)? "Lineas" : "Sin Lineas") << endl;
-      break;
-    case 'p': case 'P':  // perspectiva
-      perspectiva=!perspectiva;
-      if (cl_info) cout << ((perspectiva)? "Perspectiva" : "Ortogonal") << endl;
-      regen();
-      break;
-    case 'r': case 'R': // rotacion
-      rota=!rota;
-      if (cl_info) cout << ((rota)? "Gira" : "No Gira") << endl;
-      break;
-  }
-  if (!rota) glutIdleFunc(0); // no llama a cada rato a esa funcion
-  else glutIdleFunc(Idle_cb); // registra el callback
-  glutPostRedisplay();
-}
-
-// Special keys (non-ASCII)
-/*
-  GLUT KEY F[1,12] F[1,12] function key.
-  GLUT KEY LEFT Left directional key.
-  GLUT KEY UP Up directional key.
-  GLUT KEY RIGHT Right directional key.
-  GLUT KEY DOWN Down directional key.
-  GLUT KEY PAGE UP Page up directional key.
-  GLUT KEY PAGE DOWN Page down directional key.
-  GLUT KEY HOME Home directional key.
-  GLUT KEY END End directional key.
-  GLUT KEY INSERT Inset directional key.
-*/
-// aca es int key
-void Special_cb(int key,int xm=0,int ym=0) {
-  if (key==GLUT_KEY_F4){ // alt+f4 => exit
-    get_modifiers();
-    if (modifiers==GLUT_ACTIVE_ALT)
-      exit(EXIT_SUCCESS);
-  }
-  if (key==GLUT_KEY_UP||key==GLUT_KEY_DOWN){ // camara
-    // la camara gira alrededor del eje -x
-    double yc=eye[1]-target[1],zc=eye[2]-target[2],
-           rc=sqrt(yc*yc+zc*zc),ac=atan2(yc,zc);
-    ac+=((key==GLUT_KEY_UP) ? 1 : -1)/R2G;
-    yc=rc*sin(ac); zc=rc*cos(ac);
-    up[1]=zc; up[2]=-yc;  // perpendicular
-    eye[1]=target[1]+yc; eye[2]=target[2]+zc;
-    regen();
-  }
-  if (key==GLUT_KEY_LEFT){ // gira
-    amy-=1;
-    regen();
-  }
-  if (key==GLUT_KEY_RIGHT){ // gira
-    amy+=1;
-    regen();
-  }
-  if (key==GLUT_KEY_PAGE_UP||key==GLUT_KEY_PAGE_DOWN){ // velocidad
-    if (key==GLUT_KEY_PAGE_DOWN) ms_i++;
-    else ms_i--;
-    if (ms_i<0) ms_i=0; if (ms_i==ms_n) ms_i--;
-    msecs=ms_lista[ms_i];
-    if (cl_info){
-      if (msecs<1000)
-        cout << 1000/msecs << "fps" << endl;
-      else
-        cout << msecs/1000 << "s/frame)" << endl;
-    }
-  }
-}
-
-//------------------------------------------------------------
-// Menu
-void Menu_cb(int value){
-  if(value<256) Keyboard_cb(value);
-  else Special_cb(value-256);
-}
 
 //------------------------------------------------------------
 // Movimientos del mouse
@@ -370,7 +239,7 @@ void Motion_cb(int xm, int ym){ // drag
     }
     else { // manipulacion
       double yc=eye[1]-target[1],zc=eye[2]-target[2];
-      double ac=ac0+(ym-yclick)*180.0/h/R2G;
+      double ac=ac0+(ym-yclick)*720.0/h/R2G;
       yc=rc0*sin(ac); zc=rc0*cos(ac);
       up[1]=zc; up[2]=-yc;  // perpendicular
       eye[1]=target[1]+yc; eye[2]=target[2]+zc;
@@ -409,7 +278,126 @@ void Mouse_cb(int button, int state, int x, int y){
     }
   }
 }
+//------------------------------------------------------------
+// Teclado
+// Special keys (non-ASCII)
+// aca es int key
+void Special_cb(int key,int xm=0,int ym=0) {
+  if (key==GLUT_KEY_F4){ // alt+f4 => exit
+    get_modifiers();
+    if (modifiers==GLUT_ACTIVE_ALT)
+      exit(EXIT_SUCCESS);
+  }
+  if (key==GLUT_KEY_UP||key==GLUT_KEY_DOWN){ // camara
+    // la camara gira alrededor del eje -x
+    double yc=eye[1]-target[1],zc=eye[2]-target[2],
+           rc=sqrt(yc*yc+zc*zc),ac=atan2(yc,zc);
+    ac+=((key==GLUT_KEY_UP) ? 2 : -2)/R2G;
+    yc=rc*sin(ac); zc=rc*cos(ac);
+    up[1]=zc; up[2]=-yc;  // perpendicular
+    eye[1]=target[1]+yc; eye[2]=target[2]+zc;
+    regen();
+  }
+  if (key==GLUT_KEY_LEFT){ // gira
+    amy-=1;
+    regen();
+  }
+  if (key==GLUT_KEY_RIGHT){ // gira
+    amy+=1;
+    regen();
+  }
+  if (key==GLUT_KEY_PAGE_UP||key==GLUT_KEY_PAGE_DOWN){ // velocidad
+    if (key==GLUT_KEY_PAGE_DOWN) ms_i++;
+    else ms_i--;
+    if (ms_i<0) ms_i=0; if (ms_i==ms_n) ms_i--;
+    msecs=ms_lista[ms_i];
+    if (cl_info){
+      if (msecs<1000)
+        cout << 1000/msecs << "fps" << endl;
+      else
+        cout << msecs/1000 << "s/frame)" << endl;
+    }
+  }
+}
+// Maneja pulsaciones del teclado (ASCII keys)
+void Keyboard_cb(unsigned char key,int x=0,int y=0) {
+  switch (key){
+    case 'a': case 'A': // Antialiasing
+      antialias=!antialias;
+      if (antialias){
+        glEnable(GL_POINT_SMOOTH); glEnable(GL_LINE_SMOOTH); glEnable(GL_POLYGON_SMOOTH);
+        if (cl_info) cout << "Antialiasing" << endl;
+      }
+      else {
+        glDisable(GL_POINT_SMOOTH); glDisable(GL_LINE_SMOOTH); glDisable(GL_POLYGON_SMOOTH);
+        if (cl_info) cout << "Sin Antialiasing" << endl;
+      }
+      break;
+    case 'b': case 'B': // modo de aplicacion de textura
+      if (key=='b') texmode=(texmode+4)%5; else texmode=(texmode+1)%5;
+      if (texmode<4){
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, texmodelist[texmode]);
+      }
+      else
+        glDisable(GL_TEXTURE_2D);
+      if (cl_info) cout << "Blending Mode: " << texmodestring[texmode] << endl;
+      break;
+    case 'f': case 'F': // relleno
+      relleno=!relleno;
+      if (cl_info) cout << ((relleno)? "Relleno" : "Sin Relleno") << endl;
+      break;
+    case 'i': case 'I': // info
+      cl_info=!cl_info;
+      cout << ((cl_info)? "Info" : "Sin Info") << endl;
+      break;
+    case 'l': case 'L': // wire
+      wire=!wire;
+      if (cl_info) cout << ((wire)? "Lineas" : "Sin Lineas") << endl;
+      break;
+    case 'p': case 'P':  // perspectiva
+      perspectiva=!perspectiva;
+      if (cl_info) cout << ((perspectiva)? "Perspectiva" : "Ortogonal") << endl;
+      regen();
+      break;
+    case 'r': case 'R': // rotacion
+      rota=!rota;
+      if (cl_info) cout << ((rota)? "Gira" : "No Gira") << endl;
+      break;
+    case 's': case 'S': // smooth
+      smooth=!smooth;
+      glShadeModel((smooth) ? GL_SMOOTH : GL_FLAT);
+      if (cl_info) cout << ((smooth)? "Suave" : "Facetado") << endl;
+      break;
+    case 't': case 'T': // transparencia
+      blend=!blend;
+      if (blend){
+        glEnable(GL_BLEND);
+        if (cl_info) cout << "Transparencia" << endl;
+      }
+      else {
+        glDisable(GL_BLEND);
+        if (cl_info) cout << "Sin Transparencia" << endl;
+      }
+      break;
+    case 27: // escape => exit
+      get_modifiers();
+      if (!modifiers)
+        exit(EXIT_SUCCESS);
+      break;
+  }
+  if (!rota) glutIdleFunc(0); // no llama a cada rato a esa funcion
+  else glutIdleFunc(Idle_cb); // registra el callback
+  glutPostRedisplay();
+}
 
+//------------------------------------------------------------
+// Menu
+void Menu_cb(int value)
+{
+  if (value<256) Keyboard_cb(value);
+  else Special_cb(value-256);
+}
 //------------------------------------------------------------
 // pregunta a OpenGL por el valor de una variable de estado
 int integerv(GLenum pname){
@@ -427,67 +415,68 @@ void initialize() {
 
   glutInitWindowSize(w,h); glutInitWindowPosition(50,50);
 
-  glutCreateWindow("Visibilidad"); // crea el main window
+  glutCreateWindow("Cubo con textura"); // crea el main window
 
   //declara los callbacks
   //los que no se usan no se declaran
   glutDisplayFunc(Display_cb); // redisplays
   glutReshapeFunc(Reshape_cb); // cambio de alto y ancho
-  glutKeyboardFunc(Keyboard_cb); // tecla pulsada
-  glutSpecialFunc(Special_cb); // tecla especial pulsada
+  glutKeyboardFunc(Keyboard_cb); // teclado
+  glutSpecialFunc(Special_cb); // teclas especiales
   glutMouseFunc(Mouse_cb); // botones picados
   if (!(dibuja&&rota)) glutIdleFunc(0); // no llama a cada rato a esa funcion
   else glutIdleFunc(Idle_cb); // registra el callback
-
-  // crea el menu
-  glutCreateMenu(Menu_cb);
-    glutAddMenuEntry("     [c]_Cambia el método      ", 'c');
-    glutAddMenuEntry("     [t]_Tetera / Icosaedro    ", 't');
-    glutAddMenuEntry("     [p]_Perspectiva/Ortogonal ", 'p');
-    glutAddMenuEntry("     [r]_Rota                  ", 'r');
-    glutAddMenuEntry("     [l]_Lineas                ", 'l');
-    glutAddMenuEntry("     [f]_Caras Rellenas        ", 'f');
-    glutAddMenuEntry("    [Up]_Sube Camara           ", (256+GLUT_KEY_UP));
-    glutAddMenuEntry("  [Down]_Baja Camara           ", (256+GLUT_KEY_DOWN));
-    glutAddMenuEntry("  [Left]_Gira objeto           ", (256+GLUT_KEY_LEFT));
-    glutAddMenuEntry(" [Right]_Gira objeto           ", (256+GLUT_KEY_RIGHT));
-    glutAddMenuEntry("  [PgUp]_Aumenta Framerate     ", (256+GLUT_KEY_PAGE_UP));
-    glutAddMenuEntry("  [Pgdn]_Disminuye Framerate   ", (256+GLUT_KEY_PAGE_DOWN));
-    glutAddMenuEntry("     [j]_Luz fija ON/OFF       ", 'j');
-    glutAddMenuEntry("     [i]_Info ON/OFF           ", 'i');
-    glutAddMenuEntry("   [Esc]_Exit                  ", 27);
-  glutAttachMenu(GLUT_RIGHT_BUTTON);
 
   // ========================
   // estado normal del OpenGL
   // ========================
 
   glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LEQUAL); // habilita el z-buffer
-  glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(0,10000); // coplanaridad
-  ///se cambio el valor del glPolygonOffset( factor, units )
+  glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset (1,1); // coplanaridad
+
+  // interpola normales por nodos o una normal por plano
+  glShadeModel((smooth) ? GL_SMOOTH : GL_FLAT);
+
+  // ancho de lineas
+  glLineWidth(linewidth);
+
+  // antialiasing
+  if (antialias){
+    glEnable(GL_LINE_SMOOTH); glEnable(GL_POLYGON_SMOOTH);
+  }
+  else {
+    glDisable(GL_LINE_SMOOTH); glDisable(GL_POLYGON_SMOOTH);
+  }
+  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+  glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
+
+  // transparencias
+  if (blend) glEnable(GL_BLEND);
+  else glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
   // color de fondo
-  glClearColor(fondo[0],fondo[1],fondo[2],fondo[3]);
+  glClearColor(1,1,1,1);
 
   // direccion de los poligonos
   glFrontFace(GL_CCW); glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-  glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
+  glDisable(GL_CULL_FACE);
 
-  // material+luces
-  glEnable(GL_LIGHTING);
-
-  // define luces
-  glLightfv(GL_LIGHT0,GL_AMBIENT,lambient);
-  glLightfv(GL_LIGHT0,GL_DIFFUSE,ldiffuse);
-  // caras de atras y adelante distintos (1) o iguales (0)
-  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
-  glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,0);
-  glEnable(GL_LIGHT0);
-
-  // material estandar
-  static const float white[]={1.f,1.f,1.f,.5f};
-  glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,face_color);
-  glMaterialfv(GL_FRONT,GL_SPECULAR,white);
-  glMateriali(GL_FRONT,GL_SHININESS,50);
+  // textura
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glGenTextures(1, &texid);
+  glBindTexture(GL_TEXTURE_2D, texid);
+  mipmap_ppm("cubo.ppm");
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  if (texmode<4){
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, texmodelist[texmode]);
+  }
+  else
+    glDisable(GL_TEXTURE_2D);
 
   // ========================
   // info
@@ -513,6 +502,28 @@ void initialize() {
          << _PRINT_INT_VALUE(GL_ACCUM_ALPHA_BITS)
          ;
   // ========================
+  
+  // crea el menu
+  glutCreateMenu(Menu_cb);
+	glutAddMenuEntry("     [b]_Modo Aplicacion Sig.  ", 'b');
+	glutAddMenuEntry("     [B]_Modo Aplicacion Ant.  ", 'B');
+  glutAddMenuEntry("     [t]_Transparencia         ", 't');
+  glutAddMenuEntry("                               ", 7); // separador
+  glutAddMenuEntry("     [a]_Antialiasing          ", 'a');    
+	glutAddMenuEntry("     [f]_Caras Rellenas        ", 'f');
+	glutAddMenuEntry("     [i]_Info ON/OFF           ", 'i');
+	glutAddMenuEntry("     [l]_Lineas                ", 'l');
+	glutAddMenuEntry("     [p]_Perspectiva/Ortogonal ", 'p');
+	glutAddMenuEntry("     [r]_Rota                  ", 'r');
+	glutAddMenuEntry("     [s]_Suave/Facetado        ", 's');
+	glutAddMenuEntry("    [Up]_Sube Camara           ", (256+GLUT_KEY_UP));
+	glutAddMenuEntry("  [Down]_Baja Camara           ", (256+GLUT_KEY_DOWN));
+	glutAddMenuEntry("  [Left]_Gira objeto           ", (256+GLUT_KEY_LEFT));
+	glutAddMenuEntry(" [Right]_Gira objeto           ", (256+GLUT_KEY_RIGHT));
+	glutAddMenuEntry("  [PgUp]_Aumenta Framerate     ", (256+GLUT_KEY_PAGE_UP));
+	glutAddMenuEntry("  [Pgdn]_Disminuye Framerate   ", (256+GLUT_KEY_PAGE_DOWN));
+	glutAddMenuEntry("   [Esc]_Exit                  ", 27);
+  glutAttachMenu(GLUT_RIGHT_BUTTON);
 
   regen(); // para que setee las matrices antes del 1er draw
 }
