@@ -51,45 +51,34 @@ void DibujarTexto() {
 			//
 			glPushMatrix();
 			t = (float)i / texto_len;	/// t para obtener el punto
-			///obtengo el primer punto
-			if(i == texto_len-1){
-				punto1 = curva.Evaluar( 1 );
-			}
+			///obtengo el punto
 			punto1 = curva.Evaluar(t);	
 			///obtengo la derivada
 			curva.Evaluar(t,punto1,derivadaPunto);
-				std::cout<<"punto "<<i<<std::endl;
-				std::cout<<"derivada x: "<<derivadaPunto[0]<<std::endl;
-				std::cout<<"derivada y: "<<derivadaPunto[1]<<std::endl;
 			///obtengo el angulo para rotar la letra
-			if( derivadaPunto[0] < 0.1 and derivadaPunto[1] > 0){
-				ang = 90;
-			}else if(derivadaPunto[0] < 0.1 and derivadaPunto[1] <= 0){
-				ang = -90;
+			if(derivadaPunto[0] == 0){	///evito la division por cero
+				if(derivadaPunto[1] > 0)	ang =  M_PI;
+				else						ang = -M_PI;
+				origenx = punto1[0];
+				origeny = punto1[1] + derivadaPunto[1]*proporcion/2;
 			}else{
-				ang = atan(derivadaPunto[1]/derivadaPunto[0]);
-			}
-			///defino el nuevo origen para la letra
-			if(derivadaPunto[1] <= 0){
-				origeny = punto1[1] + abs(derivadaPunto[1])*proporcion;
-				if( derivadaPunto[0] <= 0){
-					origenx = punto1[0] + proporcion*50.f;
-				}else{
-					origenx = punto1[0];
+				if(derivadaPunto[0]<0 and derivadaPunto[1]>0){	///segundo cuadrante
+					ang = M_PI + atan(derivadaPunto[1]/derivadaPunto[0]);
 				}
-			}else if(derivadaPunto[1] > 0){
-				origeny = punto1[1];
-				origenx = punto1[0] - proporcion*50.f;
+				else if(derivadaPunto[0]<0 and derivadaPunto[1]<0){	///tercer cuadrante
+					ang = M_PI + atan(derivadaPunto[1]/derivadaPunto[0]);
+				}
+				else if(derivadaPunto[0]>0 and derivadaPunto[1]<0) {	///cuarto cuadrante
+					ang = 2*M_PI + atan(derivadaPunto[1]/derivadaPunto[0]);
+					
+				}else{
+					ang = atan(derivadaPunto[1]/derivadaPunto[0]);		///primer cuadrante
+				}				
+				origenx = punto1[0] + derivadaPunto[0]*proporcion/2;
+				origeny = punto1[1] + derivadaPunto[1]*proporcion/2;
+				
 			}
-			else{
-				origeny = punto1[1];
-				origenx = punto1[0];
-			}
-			if( i == texto_len-1){
-				origeny = punto1[1];
-				origenx = punto1[0];
-			}
-			///proporciona la letra
+			///proporciona la letra y la coloca en el punto
 			float m[] = {
 				proporcion, 0, 0, 0.00,
 				0, proporcion, 0, 0.00,
@@ -105,7 +94,7 @@ void DibujarTexto() {
 			};
 			glMultMatrixf(m);
 			glMultMatrixf(m2);
-			// dibujar_caracter dibuja una letra de 100x100
+			/// dibujar_caracter dibuja una letra de 100x100
 			dibujar_caracter(texto[i]);
 			glPopMatrix();
 		}
