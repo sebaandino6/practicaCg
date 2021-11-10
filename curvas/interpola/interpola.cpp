@@ -9,6 +9,7 @@
 #endif
 #include "p4f.hpp"
 
+#include <cmath>
 using namespace std;
 
 
@@ -70,38 +71,65 @@ void recalc(int i,bool primario=true){
   p4f vant=pc[i]-pc[iant], vpos=pc[ipos]-pc[i];
   float dant=(vant).mod(),dpos=(vpos).mod();
   if (dant<1e-6) dant=1e-6; if (dpos<1e-6) dpos=1e-6;
-  if (metodo==0){ // Catmull-Rohm
-    // direccion que une anterior y posterior
-    // derivada = distancia anterior a posterior /2/grado
-    // derivadas iguales a ambos lados={
+  if (metodo==0){ /// Catmull-Rohm
+    /// direccion que une anterior y posterior
+    /// derivada = distancia anterior a posterior /2/grado
+    /// derivadas iguales a ambos lados={
     strcpy(txt_metodo,"Catmull-Rohm: dir: ant->pos --- vel:dist(ant-pos)/2/grado");
     l=vant+vpos;
     if (i!=2)     pc[i-1]=pc[i]-l/6; else pc[i-1]=pc[i]-l/4;
     if (i!=npc-3) pc[i+1]=pc[i]+l/6; else pc[i+1]=pc[i]+l/4;
   }
-//@@@@ Implementar el método de Overhausser
+///@@@@ Implementar el método de Overhausser
   else if (metodo==1){
-    // direccion proporcional a la cercania
-    // derivada media = distancia anterior a posterior /2/grado
-    // derivadas proporcionales a las distancias
+    /// direccion proporcional a la cercania
+    /// derivada media = distancia anterior a posterior /2/grado
+    /// derivadas proporcionales a las distancias
     strcpy(txt_metodo,"Overhausser: dir: inv prop dist --- vel media=dist(ant-pos)/2/grado; indiv=prop dist");
-    //  1) calcular vectores diferencia y sus modulos (distancias)
-    //  2) dirección en proporcion inversa a las distancias (apunta mas al mas cercano)
-    //  3) puntos invisibles en proporcion directa con las distancias (mas corto el mas cercano)
+    ///  1) calcular vectores diferencia y sus modulos (distancias)
+    ///  2) dirección en proporcion inversa a las distancias (apunta mas al mas cercano)
+    ///  3) puntos invisibles en proporcion directa con las distancias (mas corto el mas cercano)
+
+	///tomamos el vi-1 
+	p4f vimenos = vant / dant; 
+	///tomamos el vi+1
+	p4f vimas = vpos / dpos;
+	///calculamos el vi en base a las direcciones y sus modulos
+	p4f vi = ( (dpos*vimenos) + (dant*vimas) ) / (dpos + dant); 
+	
+	if (i!=2){		pc[i-1] = pc[i]-(dant*vi)/ 3; 
+	}else{ 			pc[i-1] = pc[i]-(dant*vi)/ 2;}
+	
+	if(i!=npc-3){	pc[i+1] = pc[i]+(dpos*vi)/ 3;
+	}else{			pc[i+1] = pc[i]+(dpos*vi)/ 2;}
+	
   }
   
-//@@@@ Implementar algun otro modo de evitar el overshooting o hacerlo mas bonito
+///@@@@ Implementar algun otro modo de evitar el overshooting o hacerlo mas bonito
   else if (metodo==2){
-		// Una idea:
-		// direccion que une anterior y posterior (proporcional a la distancia)
-		// derivada media = distancia anterior a posterior /2/3
-		// derivadas proporcionales a las distancias
+		/// Una idea:
+		/// direccion que une anterior y posterior (proporcional a la distancia)
+		/// derivada media = distancia anterior a posterior /2/3
+		/// derivadas proporcionales a las distancias
 		strcpy(txt_metodo,"dir: ant->pos --- vel media=dist(ant-pos)/2/grado; indiv=prop dist");
+		p4f dir = vant+vpos;
+		p4f v = dir / dir.mod()/2;		
+		if (i!=2)     pc[i-1] = pc[i] - dant*v/3; else pc[i-1] = pc[i] - dant*v/2;
+		if (i!=npc-3) pc[i+1] = pc[i] + dpos*v/3; else pc[i+1] = pc[i] + dpos*v/2;
+		
   }
-//@@@@ Implementar otro método que ademas de evitar el overshooting sea C1 (derivadas iguales a cada lado)
+///@@@@ Implementar otro método que ademas de evitar el overshooting sea C1 (derivadas iguales a cada lado)
   else if (metodo==3){
 	  
     strcpy(txt_metodo,"Método 3: con continuidad C1");
+	///pongo las derivadas de los dos lados iguales
+	///tengo que tener cuidado con los extremos porque no tienen dant o dpos
+	p4f c, v, dir;
+	dir = vant+vpos;
+	v = dir / dir.mod()/2;	
+	float d = std::min(dant,dpos);	///con la minima derivada se evita el overshooting
+	if (i!=2)     pc[i-1] = pc[i] - d*v/3; else pc[i-1] = pc[i] - d*v/3;///divido por 3 en todos los casos y las 
+	if (i!=npc-3) pc[i+1] = pc[i] + d*v/3; else pc[i+1] = pc[i] + d*v/3;///derivadas me quedan iguales
   }
 
   if (primario){
